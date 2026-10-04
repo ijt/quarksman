@@ -1,0 +1,1296 @@
+<title>Feynman Diagrams</title>
+<meta name="description" content="Interactive lessons on reading Feynman diagrams, with clickable Feynman rules and an Ask Claude panel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: index rail on the left, a reading column of diagram "plates" on graph paper, Ask drawer docked right. */
+:root {
+  --bg: #F2F4F8;
+  --surface: #FFFFFF;
+  --ink: #161A2C;
+  --muted: #586079;
+  --rule: #D8DEEA;
+  --grid: #DFE4EE;
+  --accent: #2B57CF;
+  --accent-ink: #FFFFFF;
+  --fermion: var(--ink);
+  --photon: #CF6A12;
+  --gluon: #17895A;
+  --weak: #8237C9;
+  --higgs: #C93170;
+  --good: #17895A;
+  --warn: #B86E00;
+  --bad: #C2372F;
+  --display: "STIX Two Text", "Cambria Math", "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1020; --surface: #151A2E; --ink: #E6E9F4; --muted: #99A1BC; --rule: #283050; --grid: #1E2540;
+    --accent: #84A4FF; --accent-ink: #0D1020;
+    --photon: #F39A4A; --gluon: #4FCB8E; --weak: #B988F2; --higgs: #F2709F;
+    --good: #4FCB8E; --warn: #F0B24A; --bad: #F2766E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1020; --surface: #151A2E; --ink: #E6E9F4; --muted: #99A1BC; --rule: #283050; --grid: #1E2540;
+  --accent: #84A4FF; --accent-ink: #0D1020;
+  --photon: #F39A4A; --gluon: #4FCB8E; --weak: #B988F2; --higgs: #F2709F;
+  --good: #4FCB8E; --warn: #F0B24A; --bad: #F2766E;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.6 var(--body); margin: 0; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(30px, 4.4vw, 44px); }
+h2 { font-size: 24px; }
+p { margin: 0; }
+code { font-family: var(--mono); font-size: .9em; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.math { font-family: var(--display); }
+.eyebrow { font: 500 11px/1.4 var(--body); text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+
+/* App frame */
+.app { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100dvh; }
+.app.ask-open { grid-template-columns: 252px minmax(0, 1fr) 380px; }
+.sidebar { position: sticky; top: 0; height: 100dvh; overflow-y: auto; border-right: 1px solid var(--rule); padding-block: 22px; padding-inline: 14px; }
+.brand { display: flex; align-items: baseline; gap: 8px; padding-inline: 8px; margin-bottom: 18px; }
+.brand b { font: 600 20px/1.1 var(--display); }
+.brand span { color: var(--muted); font-size: 12px; }
+.nav { display: grid; gap: 18px; }
+.nav-group { display: grid; gap: 2px; }
+.nav-group .eyebrow { padding-inline: 8px; margin-bottom: 4px; }
+.nav a { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: start; padding: 6px 8px; border-radius: 7px; color: var(--ink); text-decoration: none; }
+.nav a:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.nav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); }
+.nav a[aria-current="page"] .sub, .nav a[aria-current="page"] .dotmark { color: var(--accent-ink); }
+.nav .dotmark { width: 18px; text-align: center; font-family: var(--display); color: var(--c, var(--muted)); }
+.nav .label { min-width: 0; }
+.nav .sub { display: block; font-family: var(--display); font-size: 13px; color: var(--muted); line-height: 1.3; }
+.nav-select { display: none; width: 100%; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+
+main { min-width: 0; padding-inline: 36px; padding-block: 0 72px; container-type: inline-size; }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; justify-content: flex-end; padding-block: 14px 10px; background: linear-gradient(var(--bg) 72%, transparent); pointer-events: none; }
+.topbar > * { pointer-events: auto; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--rule); background: var(--surface); padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-align: left; }
+.linkbtn:hover { text-decoration: underline; }
+
+.page { max-width: 980px; display: grid; gap: 30px; }
+.prose { max-width: 68ch; display: grid; gap: 10px; }
+.prose h2 { margin-bottom: 2px; }
+.lede { font-size: 18px; color: var(--muted); max-width: 60ch; }
+
+/* Diagram plates */
+.plate { background-color: var(--surface); background-image: radial-gradient(var(--grid) 1px, transparent 1.3px); background-size: 22px 22px; border: 1px solid var(--rule); border-radius: 10px; min-width: 0; }
+svg.diagram { display: block; width: 100%; height: auto; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.edge .line { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.edge.fermion .line, .edge.higgs .line { stroke-width: 2.7; }
+.edge.higgs .line { stroke-dasharray: 10 7; }
+.edge .arrow { fill: currentColor; }
+.edge .glow { fill: none; stroke: currentColor; stroke-width: 13; stroke-linecap: round; opacity: 0; transition: opacity .15s; }
+.edge.present .glow { opacity: .22; }
+.edge .sel { fill: none; stroke: var(--accent); stroke-width: 18; stroke-linecap: round; opacity: 0; }
+.edge.selected .sel { opacity: .32; }
+.edge .hit { fill: none; stroke: transparent; stroke-width: 22; pointer-events: stroke; outline: none; }
+.selectable .edge .hit { cursor: pointer; }
+.edge .hit:focus-visible { stroke: var(--accent); stroke-opacity: .35; }
+.edge text { font: 600 21px var(--display); fill: currentColor; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.vertex .dot { fill: var(--ink); }
+.vertex .vsel { fill: var(--accent); opacity: 0; }
+.vertex.selected .vsel { opacity: .32; }
+.vertex .vhit { fill: transparent; outline: none; }
+.selectable .vertex .vhit { cursor: pointer; }
+.vertex .vhit:focus-visible { fill: var(--accent); fill-opacity: .25; }
+.slice line { stroke: var(--accent); stroke-width: 1.8; stroke-dasharray: 5 5; }
+.slice text, .axis text, .pf text { font: 500 13px var(--body); fill: var(--muted); }
+.slice text { fill: var(--accent); }
+.slice .knob { fill: var(--accent); }
+.slice .grab { fill: transparent; cursor: ew-resize; touch-action: none; }
+.axis line, .axis path { stroke: var(--muted); stroke-width: 1.4; fill: none; }
+.pf text { letter-spacing: .1em; font-size: 12px; opacity: .8; }
+
+/* Process page */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { --c: var(--muted); display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 var(--body); padding: 5px 10px; border-radius: 999px; background: color-mix(in srgb, var(--c) 15%, transparent); color: var(--c); }
+.process-title { font: 400 clamp(32px, 5vw, 46px)/1.1 var(--display); }
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; align-items: start; }
+@container (max-width: 760px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+.stage-main { display: grid; gap: 10px; min-width: 0; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.controls input[type="range"] { flex: 1 1 200px; accent-color: var(--accent); min-width: 0; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+.present-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 30px; font-size: 14px; color: var(--muted); }
+.pill { --c: var(--ink); font: 600 15px/1 var(--display); color: var(--c); padding: 5px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); background: color-mix(in srgb, var(--c) 14%, transparent); }
+.pill.virtual { border-style: dashed; background: color-mix(in srgb, var(--c) 6%, transparent); }
+.pill small { font: 400 11px var(--body); color: var(--muted); }
+.inspector { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.inspector .big { font: 600 32px/1 var(--display); }
+.inspector dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; margin: 0; font-size: 14px; }
+.inspector dt { color: var(--muted); }
+.inspector dd { margin: 0; }
+.formula { font: 17px/1.5 var(--display); background: color-mix(in srgb, var(--accent) 7%, var(--surface)); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+.muted { color: var(--muted); }
+.small { font-size: 13.5px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; }
+.stat b { font: 600 26px/1.2 var(--display); font-variant-numeric: tabular-nums; }
+
+/* Lines page */
+.cast { display: grid; gap: 22px; }
+.cast-row { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; align-items: start; }
+@container (max-width: 640px) { .cast-row { grid-template-columns: minmax(0, 1fr); } }
+.cast-row .plate { padding: 4px; }
+.cast-row h3 { font-size: 21px; color: var(--c); }
+.cast-row .how { font-style: italic; color: var(--muted); }
+.pair { display: flex; flex-wrap: wrap; gap: 18px; }
+.pair figure { margin: 0; flex: 1 1 220px; display: grid; gap: 4px; text-align: center; font-size: 13px; }
+
+/* Vertex explorer */
+.explorer { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+@container (max-width: 760px) { .explorer { grid-template-columns: minmax(0, 1fr); } }
+.explorer svg.diagram { cursor: grab; touch-action: none; }
+.reading { font: 26px/1.3 var(--display); }
+.story-list { display: grid; gap: 4px; }
+
+/* Orders */
+.series { font: 24px/1.4 var(--display); }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.duo figure { margin: 0; display: grid; gap: 6px; }
+.duo figcaption { font-size: 14px; color: var(--muted); text-align: center; }
+.lab { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; display: grid; gap: 14px; max-width: 820px; }
+.lab input[type="range"] { width: 100%; accent-color: var(--accent); }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.bars { display: grid; gap: 8px; }
+.bar { display: grid; grid-template-columns: 64px minmax(0, 1fr) 76px; gap: 10px; align-items: center; font-size: 14px; }
+.bar .track { height: 18px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 6%, transparent); overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 4px; background: var(--accent); transition: width .35s ease; }
+.bar .fill.hot { background: var(--bad); }
+.bar .val { text-align: right; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.verdict { font-weight: 600; }
+.counts { display: flex; flex-wrap: wrap; gap: 10px; }
+.count { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 16px; text-align: center; min-width: 96px; }
+.count b { display: block; font: 600 22px var(--display); font-variant-numeric: tabular-nums; }
+.count span { font-size: 12px; color: var(--muted); }
+
+/* Quiz */
+.quiz-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.score { font: 500 16px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.options { display: grid; gap: 8px; max-width: 460px; }
+.option { display: flex; justify-content: space-between; gap: 10px; text-align: left; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 14px; cursor: pointer; font: 17px var(--display); }
+.option:hover:not(:disabled) { border-color: var(--accent); }
+.option:disabled { cursor: default; }
+.option.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--surface)); }
+.option.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 10%, var(--surface)); }
+.feedback { display: grid; gap: 10px; max-width: 62ch; }
+.feedback .verdict.ok { color: var(--good); }
+.feedback .verdict.no { color: var(--warn); }
+
+/* Ask drawer */
+.ask { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; border-left: 1px solid var(--rule); background: var(--surface); min-width: 0; }
+.ask-head { display: flex; justify-content: space-between; align-items: start; gap: 10px; padding: 16px; border-bottom: 1px solid var(--rule); }
+.ask-head h2 { font-size: 20px; }
+.ask-head .about { font-size: 12px; color: var(--muted); }
+.ask-tools { display: flex; gap: 6px; }
+.iconbtn { border: 1px solid transparent; background: none; border-radius: 6px; padding: 4px 8px; cursor: pointer; color: var(--muted); }
+.iconbtn:hover { border-color: var(--rule); color: var(--ink); }
+.ask-log { flex: 1; overflow-y: auto; padding: 16px; display: grid; gap: 14px; align-content: start; }
+.msg { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+.msg.user { justify-self: end; max-width: 88%; background: color-mix(in srgb, var(--accent) 16%, var(--surface)); padding: 8px 12px; border-radius: 12px 12px 4px 12px; }
+.msg.error { color: var(--warn); font-size: 14px; }
+.msg .note { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+.thinking { color: var(--muted); font-style: italic; }
+.suggest { display: grid; gap: 8px; }
+.suggest button { text-align: left; background: color-mix(in srgb, var(--ink) 5%, transparent); border: 1px solid transparent; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 14px; }
+.suggest button:hover { border-color: var(--accent); }
+.chiprow { display: flex; gap: 6px; overflow-x: auto; padding: 0 16px 8px; }
+.chiprow button { flex: none; font-size: 12.5px; border: 1px solid var(--rule); background: var(--bg); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.ask-input { display: flex; gap: 8px; align-items: end; padding: 12px 16px; border-top: 1px solid var(--rule); }
+.ask-input textarea { flex: 1; min-width: 0; resize: none; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; background: var(--bg); max-height: 140px; }
+
+@media (max-width: 880px) {
+  .app, .app.ask-open { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--rule); padding-block: 14px; padding-inline: 16px; }
+  .brand { padding-inline: 0; margin-bottom: 10px; }
+  .nav { display: none; }
+  .nav-select { display: block; }
+  main { padding-inline: 16px; }
+  .ask { position: fixed; inset: 0 0 0 auto; width: min(100%, 420px); z-index: 20; box-shadow: -12px 0 40px rgb(0 0 0 / .25); padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="brand"><b>Feynman Diagrams</b><span>pictures that are equations</span></div>
+    <nav class="nav" id="nav" aria-label="Lessons"></nav>
+    <label class="eyebrow" for="nav-select" hidden>Page</label>
+    <select class="nav-select" id="nav-select" aria-label="Choose a page"></select>
+  </aside>
+  <main id="main">
+    <div class="topbar"><button class="btn" id="ask-toggle" hidden aria-expanded="false" aria-controls="ask">✦ Ask Claude</button></div>
+    <div id="page"></div>
+  </main>
+  <aside class="ask" id="ask" hidden aria-label="Ask Claude about this page">
+    <div class="ask-head">
+      <div><h2>Ask Claude</h2><div class="about" id="ask-about"></div></div>
+      <div class="ask-tools">
+        <button class="iconbtn" id="ask-clear" title="Clear this page's conversation">Clear</button>
+        <button class="iconbtn" id="ask-close" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="ask-log" id="ask-log" aria-live="polite"></div>
+    <div class="chiprow" id="ask-chips"></div>
+    <form class="ask-input" id="ask-form">
+      <textarea id="ask-text" rows="1" placeholder="Ask about this page…" aria-label="Your question"></textarea>
+      <button class="btn primary" id="ask-send" type="submit">Send</button>
+    </form>
+  </aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+"use strict";
+
+/* ---------- helpers ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const md = s => esc(s)
+  .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+  .replace(/(^|[\s(])\*(\S(?:.*?\S)?)\*(?=[\s.,;:!?)]|$)/g, "$1<em>$2</em>")
+  .replace(/`([^`]+)`/g, "<code>$1</code>");
+function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+/* ---------- particles & line styles ---------- */
+const STYLES = {
+  fermion: { title: "Fermions (matter)", drawing: "Solid line with an arrow", examples: "e⁻, μ⁻, ν, quarks u d s c b t — and their antiparticles",
+    summary: "The arrow tracks the flow of particle number, not the direction of motion. An arrow pointing forward in time is a particle; an arrow pointing backward in time is its antiparticle moving forward. Arrows never start or stop at a vertex — fermion lines are continuous." },
+  photon: { title: "Photon", drawing: "Wavy line", examples: "γ — the electromagnetic force carrier",
+    summary: "Couples to electric charge with strength e (α = e²/4π ≈ 1/137). Photons are neutral, so two photons never meet at a vertex." },
+  gluon: { title: "Gluon", drawing: "Curly (coiled) line", examples: "g — the strong force carrier (8 colors)",
+    summary: "Couples to color charge with strength g_s. Gluons carry color themselves, so there are three- and four-gluon vertices. This self-interaction leads to confinement." },
+  weak: { title: "W and Z bosons", drawing: "Long wavy line", examples: "W⁺, W⁻, Z⁰ — the weak force carriers",
+    summary: "Massive (80–91 GeV), so their propagators are suppressed at low energies — that's why the weak force is weak. The W changes flavor: it turns d into u, or e⁻ into νₑ." },
+  higgs: { title: "Higgs boson", drawing: "Dashed line", examples: "H — spin-0 excitation of the Higgs field",
+    summary: "Couples to particles in proportion to their mass. A dashed line is the generic notation for any spin-0 (scalar) particle." },
+};
+
+const P = {
+  electron: { name: "Electron", symbol: "e⁻", style: "fermion", charge: "−1", spin: "½", mass: "0.511 MeV", anti: false,
+    blurb: "The lightest charged lepton, and stable. Everything in chemistry is about electrons." },
+  positron: { name: "Positron", symbol: "e⁺", style: "fermion", charge: "+1", spin: "½", mass: "0.511 MeV", anti: true,
+    blurb: "The electron's antiparticle: same mass, opposite charge. Drawn as an electron line whose arrow points backward in time." },
+  muon: { name: "Muon", symbol: "μ⁻", style: "fermion", charge: "−1", spin: "½", mass: "105.7 MeV", anti: false,
+    blurb: "A heavier copy of the electron (≈207× heavier). Decays in about 2.2 μs." },
+  antimuon: { name: "Antimuon", symbol: "μ⁺", style: "fermion", charge: "+1", spin: "½", mass: "105.7 MeV", anti: true,
+    blurb: "The muon's antiparticle." },
+  antiNuE: { name: "Electron antineutrino", symbol: "ν̄ₑ", style: "fermion", charge: "0", spin: "½", mass: "< 0.8 eV", anti: true,
+    blurb: "Nearly massless and feels only the weak force — it can pass through light-years of lead." },
+  up: { name: "Up quark", symbol: "u", style: "fermion", charge: "+⅔", spin: "½", mass: "≈2.2 MeV", anti: false,
+    blurb: "The lightest quark. A proton is uud." },
+  down: { name: "Down quark", symbol: "d", style: "fermion", charge: "−⅓", spin: "½", mass: "≈4.7 MeV", anti: false,
+    blurb: "A neutron is udd. Slightly heavier than the up quark, which is why free neutrons decay." },
+  top: { name: "Top quark", symbol: "t", style: "fermion", charge: "+⅔", spin: "½", mass: "≈172.6 GeV", anti: false,
+    blurb: "The heaviest known elementary particle, so it couples most strongly to the Higgs." },
+  photon: { name: "Photon", symbol: "γ", style: "photon", charge: "0", spin: "1", mass: "0", anti: false,
+    blurb: "Carrier of electromagnetism. It is neutral, so photons don't couple directly to each other." },
+  gluon: { name: "Gluon", symbol: "g", style: "gluon", charge: "0 (but carries color)", spin: "1", mass: "0", anti: false,
+    blurb: "Carrier of the strong force. Comes in 8 color combinations and interacts with other gluons." },
+  wMinus: { name: "W⁻ boson", symbol: "W⁻", style: "weak", charge: "−1", spin: "1", mass: "80.4 GeV", anti: false,
+    blurb: "Charged carrier of the weak force. It changes flavor: d → u, e⁻ → νₑ." },
+  higgs: { name: "Higgs boson", symbol: "H", style: "higgs", charge: "0", spin: "0", mass: "125.1 GeV", anti: false,
+    blurb: "Excitation of the Higgs field, which gives mass to the W, Z and fermions. Discovered at the LHC in 2012." },
+};
+
+const INTERACTIONS = {
+  qed: { title: "Electromagnetic (QED)", mark: "γ", color: "var(--photon)" },
+  qcd: { title: "Strong (QCD)", mark: "g", color: "var(--gluon)" },
+  weak: { title: "Weak", mark: "W", color: "var(--weak)" },
+  higgs: { title: "Higgs", mark: "H", color: "var(--higgs)" },
+};
+
+/* ---------- diagram model ---------- */
+const X = (id, x, y) => ({ id, x, y, v: false });
+const V = (id, x, y) => ({ id, x, y, v: true });
+function E(from, to, p, o = {}) {
+  return { from, to, p, arrow: o.arrow ?? (p.style === "fermion" ? (p.anti ? "backward" : "forward") : "none"),
+    bend: o.bend || 0, side: o.side ?? -1, label: o.label ?? p.symbol };
+}
+function D(o) {
+  o.aspect = o.aspect || 1.6;
+  o.edges.forEach((e, i) => { e.id = i; });
+  o.node = Object.fromEntries(o.nodes.map(n => [n.id, n]));
+  o.vertices = o.nodes.filter(n => n.v);
+  o.isInternal = e => o.node[e.from].v && o.node[e.to].v;
+  o.internal = o.edges.filter(o.isInternal);
+  o.loops = Math.max(0, o.internal.length - o.vertices.length + 1);
+  o.edgesAt = id => o.edges.filter(e => e.from === id || e.to === id);
+  return o;
+}
+
+const CATALOG = [
+  D({ id: "ee-mumu", title: "e⁺e⁻ → μ⁺μ⁻", process: "e⁻ e⁺ → μ⁻ μ⁺", interaction: "qed",
+    summary: "An electron and positron annihilate into a virtual photon, which then turns into a muon–antimuon pair.",
+    details: [
+      "Read it left to right. At the first vertex the electron and positron disappear and a **virtual photon** appears. At the second vertex the photon turns into a muon and an antimuon.",
+      "This is an **s-channel** diagram: the virtual photon carries the whole collision energy, so q² = s = E²ᶜᵐ. A real photon always has q² = 0, so this photon is **off-shell**. That's allowed only because it is never observed.",
+      "There are two vertices, so the amplitude goes as e² and the cross-section as α². Working through the Feynman rules gives the textbook result σ = 4πα²/3s.",
+    ],
+    amplitude: "𝓜 = [v̄(p₂)(−ieγ^μ)u(p₁)] · (−ig_μν / q²) · [ū(p₃)(−ieγ^ν)v(p₄)]",
+    nodes: [X("a", .04, .12), X("b", .04, .88), V("v1", .36, .5), V("v2", .64, .5), X("c", .96, .12), X("d", .96, .88)],
+    edges: [E("a", "v1", P.electron), E("b", "v1", P.positron, { side: 1 }), E("v1", "v2", P.photon, { label: "γ*" }),
+      E("v2", "c", P.muon), E("v2", "d", P.antimuon, { side: 1 })] }),
+  D({ id: "moller", title: "Møller scattering", process: "e⁻ e⁻ → e⁻ e⁻", interaction: "qed",
+    summary: "Two electrons repel each other by exchanging a virtual photon.",
+    details: [
+      "This is a **t-channel** exchange. The photon carries momentum from one electron to the other, and q² = t < 0, which no real photon can have.",
+      "The electrons are identical, so there's a second diagram with the two outgoing electrons swapped (the **u-channel**). Add the amplitudes *before* squaring. They come with a relative minus sign because electrons are fermions.",
+      "The photon propagator 1/q² is where Coulomb's law comes from: its Fourier transform is the 1/r potential.",
+      "The photon line is drawn vertically, but that doesn't mean it travels instantly. One diagram covers *every* time ordering of the internal vertices at once.",
+    ],
+    amplitude: "𝓜 = 𝓜_t − 𝓜_u,   𝓜_t = (−ie)² [ū₃γ^μu₁] (−ig_μν / t) [ū₄γ^νu₂]",
+    nodes: [X("a", .04, .1), X("b", .04, .9), V("v1", .5, .25), V("v2", .5, .75), X("c", .96, .1), X("d", .96, .9)],
+    edges: [E("a", "v1", P.electron), E("v1", "c", P.electron), E("b", "v2", P.electron, { side: 1 }),
+      E("v2", "d", P.electron, { side: 1 }), E("v1", "v2", P.photon, { label: "γ*" })] }),
+  D({ id: "compton", title: "Compton scattering", process: "e⁻ γ → e⁻ γ", interaction: "qed",
+    summary: "A photon scatters off an electron: the electron absorbs it, briefly becomes virtual, then emits a new photon.",
+    details: [
+      "In this s-channel diagram the electron absorbs the incoming photon first. The internal electron line is virtual: its four-momentum p + k doesn't satisfy p² = m².",
+      "There's a second (u-channel) diagram where the electron emits the outgoing photon *before* absorbing the incoming one. You need both for a gauge-invariant answer.",
+      "At low energy this reduces to Thomson scattering, σ = 8πr²ₑ/3. At high energy you get the Klein–Nishina formula. Compton's 1923 wavelength-shift measurement was early evidence that light comes in quanta.",
+    ],
+    amplitude: "𝓜 = (−ie)² ε*_ν ε_μ ū(p′) γ^ν [i(p̸ + k̸ + m) / (s − m²)] γ^μ u(p)  +  (u-channel)",
+    nodes: [X("a", .04, .82), X("b", .04, .18), V("v1", .36, .5), V("v2", .64, .5), X("c", .96, .82), X("d", .96, .18)],
+    edges: [E("a", "v1", P.electron, { side: 1 }), E("b", "v1", P.photon), E("v1", "v2", P.electron, { side: 1, label: "e*" }),
+      E("v2", "c", P.electron, { side: 1 }), E("v2", "d", P.photon)] }),
+  D({ id: "annihilation", title: "Pair annihilation", process: "e⁻ e⁺ → γ γ", interaction: "qed",
+    summary: "Matter meets antimatter: an electron and positron annihilate into two photons.",
+    details: [
+      "Follow the fermion arrow. It comes in along the electron, runs down the internal line, and leaves backward in time along the positron. That's one continuous fermion line.",
+      "Why two photons and not one? A single real photon can't carry away the energy of a pair at rest while also having zero total momentum.",
+      "PET scanners use this process. They detect the two back-to-back 511 keV photons from positrons annihilating in the body.",
+    ],
+    amplitude: "𝓜 = (−ie)² ε*_μ(k₁) ε*_ν(k₂) v̄(p₂) γ^ν [i(p̸₁ − k̸₁ + m) / (t − m²)] γ^μ u(p₁)  +  (crossed)",
+    nodes: [X("a", .04, .15), X("b", .04, .85), V("v1", .5, .28), V("v2", .5, .72), X("c", .96, .12), X("d", .96, .88)],
+    edges: [E("a", "v1", P.electron), E("b", "v2", P.positron, { side: 1 }), E("v1", "v2", P.electron, { label: "e*" }),
+      E("v1", "c", P.photon), E("v2", "d", P.photon, { side: 1 })] }),
+  D({ id: "beta", title: "Neutron β decay", process: "n → p e⁻ ν̄ₑ", interaction: "weak",
+    summary: "A down quark inside a neutron emits a virtual W⁻ and becomes an up quark, turning the neutron into a proton.",
+    details: [
+      "The neutron (udd) becomes a proton (uud). The virtual W⁻ carries away one unit of negative charge and decays to an electron and an electron antineutrino.",
+      "The W is about 80,000 times heavier than the ~1 MeV of energy released. Its propagator 1/(q² − M²_W) ≈ −1/M²_W is therefore tiny. That's why the weak force is weak, and why a free neutron lives about 15 minutes.",
+      "The other two quarks are **spectators**. They don't touch any vertex.",
+      "The W vertex couples only to left-handed particles, through the factor (1 − γ⁵). This is where parity violation comes from.",
+    ],
+    amplitude: "𝓜 ≈ (g² / 8M²_W) [ū_u γ^μ(1 − γ⁵) u_d] [ū_e γ_μ(1 − γ⁵) v_ν],   G_F/√2 = g²/8M²_W",
+    nodes: [X("a", .04, .55), V("v1", .4, .55), X("c", .96, .55), V("v2", .66, .22), X("e", .96, .05), X("f", .96, .36),
+      X("s1", .04, .72), X("s2", .96, .72), X("s3", .04, .88), X("s4", .96, .88)],
+    edges: [E("a", "v1", P.down), E("v1", "c", P.up), E("v1", "v2", P.wMinus), E("v2", "e", P.electron),
+      E("v2", "f", P.antiNuE, { side: 1 }), E("s1", "s2", P.up), E("s3", "s4", P.down)] }),
+  D({ id: "qq", title: "Quark scattering", process: "u d → u d", interaction: "qcd",
+    summary: "Two quarks scatter by exchanging a virtual gluon — the strong-force version of Møller scattering.",
+    details: [
+      "It's the same shape as photon exchange, but the gluon carries **color**: a color–anticolor combination. The quarks can swap colors in the process.",
+      "The coupling α_s is about 0.1 at high energies and approaches 1 below a few hundred MeV. Near 1, adding more loops doesn't make the answer smaller, so perturbation theory stops working.",
+      "At very high energies α_s gets *smaller* (**asymptotic freedom**, Nobel Prize 2004), so diagrams like this one describe jets at the LHC well.",
+    ],
+    amplitude: "𝓜 = (−ig_s)² [ū₃ γ^μ Tᵃ u₁] (−ig_μν δᵃᵇ / t) [ū₄ γ^ν Tᵇ u₂]",
+    nodes: [X("a", .04, .1), X("b", .04, .9), V("v1", .5, .25), V("v2", .5, .75), X("c", .96, .1), X("d", .96, .9)],
+    edges: [E("a", "v1", P.up), E("v1", "c", P.up), E("b", "v2", P.down, { side: 1 }), E("v2", "d", P.down, { side: 1 }),
+      E("v1", "v2", P.gluon, { label: "g*" })] }),
+  D({ id: "ggg", title: "Gluon self-interaction", process: "g g → g g", interaction: "qcd",
+    summary: "Gluons scatter off each other through the three-gluon vertex — something photons can never do.",
+    details: [
+      "A photon has no electric charge, so no vertex joins three photons. A gluon *does* carry color charge, so gluons couple directly to other gluons.",
+      "This self-interaction is what makes QCD so different from QED. It's behind both **confinement** (quarks are never seen alone) and **asymptotic freedom**.",
+      "The full amplitude also needs s-, t- and u-channel exchanges plus a four-gluon contact vertex. Only the s-channel piece is drawn here.",
+    ],
+    amplitude: "𝓜 ∝ g_s² f^{abe} f^{cde} V_{μνλ} (−ig^{λσ}/s) V_{ρτσ} ε^μ ε^ν ε*^ρ ε*^τ  +  (t, u, contact)",
+    nodes: [X("a", .04, .12), X("b", .04, .88), V("v1", .36, .5), V("v2", .64, .5), X("c", .96, .12), X("d", .96, .88)],
+    edges: [E("a", "v1", P.gluon), E("b", "v1", P.gluon, { side: 1 }), E("v1", "v2", P.gluon, { label: "g*" }),
+      E("v2", "c", P.gluon), E("v2", "d", P.gluon, { side: 1 })] }),
+  D({ id: "vacpol", title: "Vacuum polarization", process: "e⁻ μ⁻ → e⁻ μ⁻ (1 loop)", interaction: "qed",
+    summary: "The exchanged photon briefly splits into a virtual electron–positron pair — a one-loop correction.",
+    details: [
+      "The virtual photon fluctuates into an e⁺e⁻ pair that annihilates again. Empty space behaves like a polarizable medium.",
+      "**Effect:** charge is screened at long distances, so the effective coupling *grows* at short distances. α runs from 1/137 at low energy to about 1/128 at the Z mass.",
+      "The loop momentum isn't fixed by conservation, so you integrate over all of it, and the integral diverges. **Renormalization** absorbs the infinity into the measured value of e.",
+      "Four vertices give e⁴. Compared with the tree diagram, that's a correction of order α/π ≈ 0.2%.",
+    ],
+    amplitude: "𝓜 ∝ e⁴ [ū₃γ^μu₁] (1/q²) Π_μν(q) (1/q²) [ū₄γ^νu₂],   Π ∝ ∫d⁴k Tr[γ S(k) γ S(k+q)]",
+    nodes: [X("a", .04, .1), V("v1", .5, .14), X("c", .96, .1), V("v2", .5, .36), V("v3", .5, .64),
+      X("b", .04, .9), V("v4", .5, .86), X("d", .96, .9)],
+    edges: [E("a", "v1", P.electron), E("v1", "c", P.electron), E("b", "v4", P.muon, { side: 1 }), E("v4", "d", P.muon, { side: 1 }),
+      E("v1", "v2", P.photon, { label: "γ*" }), E("v2", "v3", P.electron, { bend: .8, side: 1, label: "e" }),
+      E("v3", "v2", P.electron, { bend: .8, side: 1, label: "e" }), E("v3", "v4", P.photon, { label: "γ*" })] }),
+  D({ id: "g-2", title: "Electron g − 2", process: "e⁻ + field → e⁻ (1 loop)", interaction: "qed",
+    summary: "The electron emits and reabsorbs a virtual photon while interacting with a magnetic field. This shifts its magnetic moment.",
+    details: [
+      "The photon at the top represents an external magnetic field. Without the loop you just get Dirac's prediction, g = 2.",
+      "Julian Schwinger computed this one-loop diagram in 1948 and found a = (g − 2)/2 = α/2π ≈ 0.00116. That number is carved on his tombstone.",
+      "Since then, physicists have calculated the 5-loop contributions (12,672 diagrams). Theory and experiment agree to better than one part in a billion, which makes this one of the most precise predictions in all of science.",
+    ],
+    amplitude: "𝓜 ∝ e³ ∫d⁴k  ū(p′) γ^ν S(p′ − k) γ^μ S(p − k) γ_ν u(p) · (1/k²) · A_μ(q)",
+    nodes: [X("a", .04, .86), V("v1", .3, .7), V("v0", .5, .42), V("v2", .7, .7), X("c", .96, .86), X("f", .5, .05)],
+    edges: [E("a", "v1", P.electron, { side: 1 }), E("v1", "v0", P.electron, { label: "e*" }), E("v0", "v2", P.electron, { label: "e*" }),
+      E("v2", "c", P.electron, { side: 1 }), E("f", "v0", P.photon, { label: "γ (field)" }),
+      E("v1", "v2", P.photon, { bend: .4, side: 1, label: "γ*" })] }),
+  D({ id: "h-gg", title: "Higgs → γγ", process: "H → γ γ", interaction: "higgs",
+    summary: "The neutral Higgs decays to two photons through a triangle loop of charged top quarks.",
+    details: [
+      "The Higgs has no electric charge, so it can't couple to photons directly. It reaches them only through a **loop** of massive charged particles: mostly the top quark, plus W bosons in other diagrams.",
+      "Each Higgs–fermion vertex is proportional to the fermion's mass (m_f / v). That's why the heaviest particle, the top, dominates the loop.",
+      "Only about 0.2% of Higgs bosons decay this way. Even so, the clean two-photon signal was one of the two channels in which the Higgs was discovered at the LHC in 2012.",
+    ],
+    amplitude: "𝓜 ∝ (m_t/v) e² Q²_t N_c ∫d⁴k Tr[S(k) γ^μ S(k+p₁) γ^ν S(k−p₂)] ε*_μ ε*_ν",
+    nodes: [X("a", .04, .5), V("v1", .36, .5), V("v2", .64, .24), V("v3", .64, .76), X("c", .96, .1), X("d", .96, .9)],
+    edges: [E("a", "v1", P.higgs), E("v1", "v2", P.top), E("v2", "v3", P.top), E("v3", "v1", P.top),
+      E("v2", "c", P.photon), E("v3", "d", P.photon, { side: 1 })] }),
+];
+const byId = id => CATALOG.find(d => d.id === id);
+
+/* ---------- Feynman rules ---------- */
+function role(d, e) {
+  const f = d.node[e.from].v, t = d.node[e.to].v;
+  return f && t ? "internal" : !f && t ? "incoming" : f && !t ? "outgoing" : "spectator";
+}
+function edgeRule(d, e) {
+  const p = e.p, r = role(d, e);
+  if (r === "spectator") return { title: "Spectator line", formula: "(no factor)", text: "This particle doesn't touch any vertex. It just goes along for the ride." };
+  if (r === "internal") {
+    const formula = { fermion: "i(q̸ + m) / (q² − m²)", photon: "−i g_μν / q²", gluon: "−i g_μν δᵃᵇ / q²",
+      weak: "−i (g_μν − q_μq_ν/M²) / (q² − M²)", higgs: "i / (q² − m²_H)" }[p.style];
+    return { title: `Propagator (virtual ${p.name.toLowerCase()})`, formula,
+      text: "Internal lines are **virtual**. They're off-shell, meaning q² ≠ m², and are never observed directly. The propagator is largest when q² is close to m². That's how resonances appear." };
+  }
+  const inc = r === "incoming";
+  let formula;
+  if (p.style === "fermion") formula = inc ? (p.anti ? "v̄(p)" : "u(p)") : (p.anti ? "v(p)" : "ū(p)");
+  else if (p.style === "photon" || p.style === "weak") formula = inc ? "ε_μ(p)" : "ε*_μ(p)";
+  else if (p.style === "gluon") formula = (inc ? "ε_μ(p)" : "ε*_μ(p)") + " · color vector";
+  else formula = "1";
+  return { title: `External ${r} ${p.name.toLowerCase()}`, formula,
+    text: "External lines are **real** particles: on-shell (p² = m²) and seen in the detector. Each one contributes a wavefunction factor: a spinor for fermions, a polarization vector for vector bosons." };
+}
+function vertexRule(d, id) {
+  const legs = d.edgesAt(id), styles = legs.map(e => e.p.style);
+  if (styles.filter(s => s === "gluon").length >= 3)
+    return { title: "Three-gluon vertex", formula: "g_s f^{abc} [g_μν(k−p)_ρ + g_νρ(p−q)_μ + g_ρμ(q−k)_ν]",
+      text: "Gluons carry color charge, so they couple to each other. QED has no three-photon vertex because the photon is neutral." };
+  if (styles.includes("gluon"))
+    return { title: "Quark–gluon vertex", formula: "−i g_s γ^μ Tᵃ",
+      text: "Strength g_s, with α_s = g²_s/4π ≈ 0.1–1. The color matrix Tᵃ lets the quark change color. Flavor and electric charge are conserved." };
+  if (styles.includes("weak"))
+    return { title: "Charged-current weak vertex", formula: "−i (g/√2) γ^μ ½(1 − γ⁵)",
+      text: "The W changes flavor (d → u, e⁻ ↔ νₑ) and couples only to left-handed particles, which violates parity. Electric charge is still conserved: −⅓ = +⅔ + (−1)." };
+  if (styles.includes("higgs"))
+    return { title: "Yukawa (Higgs–fermion) vertex", formula: "−i m_f / v,   v ≈ 246 GeV",
+      text: "The Higgs couples in proportion to mass. For the top quark, m_t/v ≈ 0.7. For the electron it's 0.000002." };
+  const field = legs.some(e => e.label.includes("field"));
+  return { title: "QED vertex", formula: "−i Q e γ^μ",
+    text: "Strength e, with √α ≈ 0.085. Every vertex conserves charge, energy and momentum. The fermion arrow goes in and comes out again." + (field ? " The top photon is an external classical field: a magnet." : "") };
+}
+
+/* ---------- geometry ---------- */
+function sampleEdge(a, b, bend, n = 96) {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const c = [(a[0] + b[0]) / 2 - dy * bend, (a[1] + b[1]) / 2 + dx * bend];
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, u = 1 - t;
+    pts.push([u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]]);
+  }
+  const cum = [0];
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const xs = pts.map(p => p[0]);
+  return { pts, cum, L: cum[cum.length - 1], minX: Math.min(...xs), maxX: Math.max(...xs) };
+}
+function locate(g, s) {
+  s = clamp(s, 0, g.L);
+  let lo = 0, hi = g.cum.length - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (g.cum[m] <= s) lo = m; else hi = m; }
+  const p0 = g.pts[lo], p1 = g.pts[hi];
+  const f = (s - g.cum[lo]) / Math.max(g.cum[hi] - g.cum[lo], 1e-9);
+  const d = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
+  const t = d > 1e-9 ? [(p1[0] - p0[0]) / d, (p1[1] - p0[1]) / d] : [1, 0];
+  return { p: [p0[0] + (p1[0] - p0[0]) * f, p0[1] + (p1[1] - p0[1]) * f], t };
+}
+const line = d3.line();
+function wave(g, amp, half) {
+  const L = g.L; if (L < 1) return line(g.pts);
+  const n = Math.max(1, Math.round(L / half)), steps = Math.max(Math.floor(L / 1.5), 8), pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const s = L * i / steps, { p, t } = locate(g, s), off = amp * Math.sin(Math.PI * n * s / L);
+    pts.push([p[0] - t[1] * off, p[1] + t[0] * off]);
+  }
+  return line(pts);
+}
+// A prolate cycloid along the curve, faded in and out at the ends: the gluon "spring".
+function coil(g, along, across, pitch) {
+  const L = g.L; if (L < 1) return line(g.pts);
+  const n = Math.max(2, Math.round(L / pitch)), steps = n * 28, pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const s0 = L * i / steps, phi = 2 * Math.PI * n * s0 / L;
+    const env = Math.min(1, s0 / pitch, (L - s0) / pitch);
+    const { p, t } = locate(g, clamp(s0 + env * along * (Math.cos(phi) - 1), 0, L));
+    const off = env * across * Math.sin(phi);
+    pts.push([p[0] - t[1] * off, p[1] + t[0] * off]);
+  }
+  return line(pts);
+}
+function edgePath(style, g) {
+  if (style === "photon") return wave(g, 6, 10);
+  if (style === "weak") return wave(g, 7.5, 16);
+  if (style === "gluon") return coil(g, 6, 8, 13.5);
+  return line(g.pts);
+}
+function arrowPath(g, reversed) {
+  const { p, t: t0 } = locate(g, g.L / 2);
+  const t = reversed ? [-t0[0], -t0[1]] : t0, n = [-t[1], t[0]];
+  const Q = (a, b) => [p[0] + t[0] * a + n[0] * b, p[1] + t[1] * a + n[1] * b];
+  return "M" + [Q(9, 0), Q(-6, 7), Q(-2.5, 0), Q(-6, -7)].map(q => q.join(",")).join("L") + "Z";
+}
+/** Edges that exist at normalized time t: the "state" of the system at that instant. */
+function edgesCrossing(d, t) {
+  const pt = id => [d.node[id].x * d.aspect, d.node[id].y];
+  const x = t * d.aspect;
+  return d.edges.filter(e => { const g = sampleEdge(pt(e.from), pt(e.to), e.bend, 24); return g.minX < x && x < g.maxX; });
+}
+
+/* ---------- diagram view (d3) ---------- */
+function diagramView(diagram, opts = {}) {
+  const o = { labels: true, timeArrow: true, selectable: false, sliceDraggable: true, pastFuture: false, ...opts };
+  const W = 800, FX = 44, FW = 712, FY = 40;
+  let d = diagram, state = { slice: null, selection: null }, geoms = [], FH = 0;
+
+  const svg = d3.create("svg").attr("class", "diagram" + (o.selectable ? " selectable" : "")).attr("role", "group");
+  const bg = svg.append("rect").attr("fill", "transparent");
+  const gDeco = svg.append("g");
+  const gSlice = svg.append("g").attr("class", "slice");
+  const gEdges = svg.append("g");
+  const gVerts = svg.append("g");
+  const gKnob = svg.append("g").attr("class", "slice");
+
+  if (o.selectable) bg.on("click", () => o.onSelect?.(null));
+
+  const pt = id => [FX + d.node[id].x * FW, FY + d.node[id].y * FH];
+
+  function draw() {
+    FH = FW / d.aspect;
+    const H = FY + FH + (o.timeArrow ? 62 : 30);
+    svg.attr("viewBox", `0 0 ${W} ${H}`).attr("aria-label", `Feynman diagram: ${d.process || "QED vertex"}`);
+    bg.attr("width", W).attr("height", H);
+    geoms = d.edges.map(e => sampleEdge(pt(e.from), pt(e.to), e.bend));
+
+    gDeco.selectChildren().remove();
+    if (o.timeArrow) {
+      const y = FY + FH + 40, ax = gDeco.append("g").attr("class", "axis");
+      ax.append("line").attr("x1", FX).attr("x2", FX + 84).attr("y1", y).attr("y2", y);
+      ax.append("path").attr("d", `M${FX + 76},${y - 5}L${FX + 84},${y}L${FX + 76},${y + 5}`);
+      ax.append("text").attr("x", FX + 94).attr("y", y).attr("dominant-baseline", "central").text("time");
+    }
+    if (o.pastFuture) {
+      const pf = gDeco.append("g").attr("class", "pf");
+      pf.append("text").attr("x", FX).attr("y", 16).text("PAST");
+      pf.append("text").attr("x", FX + FW).attr("y", 16).attr("text-anchor", "end").text("FUTURE");
+    }
+
+    gEdges.selectChildren().remove();
+    d.edges.forEach((e, i) => {
+      const g = geoms[i], path = edgePath(e.p.style, g);
+      const ge = gEdges.append("g").attr("class", `edge ${e.p.style}`).attr("data-id", e.id).style("color", `var(--${e.p.style})`);
+      ge.append("path").attr("class", "sel").attr("d", path);
+      ge.append("path").attr("class", "glow").attr("d", path);
+      ge.append("path").attr("class", "line").attr("d", path);
+      if (e.arrow !== "none") ge.append("path").attr("class", "arrow").attr("d", arrowPath(g, e.arrow === "backward"));
+      if (o.labels) {
+        const { p, t } = locate(g, g.L / 2);
+        const wavy = e.p.style !== "fermion" && e.p.style !== "higgs";
+        const extra = Math.max(0, [...e.label].length - 2) * 5 * Math.abs(t[1]);
+        const dd = ((wavy ? 26 : 22) + extra) * e.side;
+        ge.append("text").attr("x", p[0] - t[1] * dd).attr("y", p[1] + t[0] * dd).text(e.label);
+      }
+      const hit = ge.append("path").attr("class", "hit").attr("d", line(g.pts));
+      if (o.selectable) {
+        hit.attr("tabindex", 0).attr("role", "button").attr("aria-label", `${e.p.name} line (${e.label})`)
+          .on("click", () => o.onSelect?.({ edge: e.id }))
+          .on("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); o.onSelect?.({ edge: e.id }); } });
+      }
+    });
+
+    gVerts.selectChildren().remove();
+    d.vertices.forEach(v => {
+      const [x, y] = pt(v.id);
+      const gv = gVerts.append("g").attr("class", "vertex").attr("data-id", v.id);
+      gv.append("circle").attr("class", "vsel").attr("cx", x).attr("cy", y).attr("r", 16);
+      gv.append("circle").attr("class", "dot").attr("cx", x).attr("cy", y).attr("r", 5.5);
+      if (o.selectable) {
+        gv.append("circle").attr("class", "vhit").attr("cx", x).attr("cy", y).attr("r", 16)
+          .attr("tabindex", 0).attr("role", "button").attr("aria-label", `Vertex ${v.id}`)
+          .on("click", () => o.onSelect?.({ vertex: v.id }))
+          .on("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); o.onSelect?.({ vertex: v.id }); } });
+      }
+    });
+
+    gSlice.selectChildren().remove();
+    gKnob.selectChildren().remove();
+    gSlice.append("line").attr("y1", FY - 20).attr("y2", FY + FH + 20);
+    gSlice.append("text").attr("y", FY - 28).attr("text-anchor", "middle").text("now");
+    if (o.sliceDraggable && o.onSlice) {
+      // Drag coordinates are in the parent <g>'s user space, which is the viewBox.
+      const drag = d3.drag().on("start drag", ev => o.onSlice(clamp((ev.x - FX) / FW, 0, 1)));
+      gKnob.append("rect").attr("class", "grab").attr("y", FY - 40).attr("width", 28).attr("height", FH + 64).call(drag);
+      gKnob.append("circle").attr("class", "knob").attr("cy", FY + FH + 20).attr("r", 7).style("pointer-events", "none");
+    }
+  }
+
+  function update(next) {
+    state = { ...state, ...next };
+    const on = state.slice != null;
+    gSlice.style("display", on ? null : "none");
+    gKnob.style("display", on ? null : "none");
+    let present = new Set();
+    if (on) {
+      const x = FX + state.slice * FW;
+      gSlice.select("line").attr("x1", x).attr("x2", x);
+      gSlice.select("text").attr("x", x);
+      gKnob.select("rect").attr("x", x - 14);
+      gKnob.select("circle").attr("cx", x);
+      geoms.forEach((g, i) => { if (g.minX < x && x < g.maxX) present.add(i); });
+    }
+    const sel = state.selection;
+    gEdges.selectAll("g.edge")
+      .classed("present", function () { return present.has(+this.dataset.id); })
+      .classed("selected", function () { return sel?.edge === +this.dataset.id; });
+    gVerts.selectAll("g.vertex").classed("selected", function () { return sel?.vertex === this.dataset.id; });
+  }
+
+  draw();
+  update({});
+  return { node: svg.node(), svg, update, setDiagram(nd) { d = nd; draw(); update({}); } };
+}
+
+/* ---------- page context for Ask ---------- */
+function diagramContext(d, selection, time) {
+  const lines = [
+    `Diagram: ${d.title} — process ${d.process} (${INTERACTIONS[d.interaction].title}).`,
+    `Time runs left to right. ${d.vertices.length} vertices, ${d.internal.length} internal lines, ${d.loops} loop(s).`,
+    `Summary: ${d.summary}`,
+    ...d.details.map(s => "• " + s),
+    `Amplitude shown: ${d.amplitude}`,
+    "Lines:",
+    ...d.edges.map(e => `  - ${e.label} (${e.p.name}), ${role(d, e)}, ${e.from}→${e.to}; rule ${edgeRule(d, e).formula}`),
+    ...d.vertices.map(v => { const r = vertexRule(d, v.id); return `  - vertex ${v.id}: ${r.title} joining ${d.edgesAt(v.id).map(e => e.label).join(", ")}; rule ${r.formula}`; }),
+  ];
+  if (selection?.edge != null) { const e = d.edges[selection.edge]; lines.push(`The user has selected the line ${e.label} (${e.p.name}, ${role(d, e)}).`); }
+  if (selection?.vertex) lines.push(`The user has selected vertex ${selection.vertex} (${vertexRule(d, selection.vertex).title}).`);
+  if (time != null) {
+    const present = edgesCrossing(d, time).map(e => e.label + (d.isInternal(e) ? " (virtual)" : ""));
+    lines.push(`Time slice at ${Math.round(time * 100)}% across the diagram; particles present: ${present.length ? present.join(", ") : "none (at a vertex)"}.`);
+  }
+  return lines.join("\n");
+}
+
+/* ---------- shared bits ---------- */
+const section = (title, paragraphs) => `<section class="prose">${title ? `<h2>${esc(title)}</h2>` : ""}${paragraphs.map(p => `<p>${md(p)}</p>`).join("")}</section>`;
+function plate(view) { const p = el(`<div class="plate"></div>`); p.append(view.node); return p; }
+function lineSample(style, arrow) {
+  const svg = d3.create("svg").attr("class", "diagram").attr("viewBox", "0 0 260 60").attr("aria-hidden", "true");
+  const g = sampleEdge([18, 30], [242, 30], 0);
+  const ge = svg.append("g").attr("class", `edge ${style}`).style("color", `var(--${style})`);
+  ge.append("path").attr("class", "line").attr("d", edgePath(style, g));
+  const a = arrow ?? (style === "fermion" ? "forward" : "none");
+  if (a !== "none") ge.append("path").attr("class", "arrow").attr("d", arrowPath(g, a === "backward"));
+  return svg.node();
+}
+
+/* ---------- pages ---------- */
+function introPage() {
+  const d = byId("ee-mumu");
+  let time = 0.1;
+  const root = el(`<article class="page">
+    <header class="prose"><span class="eyebrow">Introduction</span><h1>Feynman Diagrams</h1><p class="lede">Pictures that are also equations.</p></header>
+    ${section("What are they?", [
+      "In 1948 Richard Feynman introduced a way to draw particle interactions. Each picture stands for a precise mathematical term in a calculation. Each line and vertex has a **Feynman rule** that turns it into a factor, and multiplying the factors gives the **amplitude** 𝓜 for the process.",
+      "To get the probability of a process, add up the amplitudes of *every* diagram with the same incoming and outgoing particles, then square: P ∝ |𝓜₁ + 𝓜₂ + …|².",
+    ])}
+    <section class="stage-main" style="max-width:780px">
+      <div data-slot="plate"></div>
+      <div class="controls"><label class="small muted" for="intro-time">Drag time forward</label><input id="intro-time" type="range" min="0" max="1" step="0.001"></div>
+      <p class="small muted" data-slot="state"></p>
+    </section>
+    ${section("How to read one", [
+      "**Time runs left to right** in this app. Some books draw time running upward. The physics is the same.",
+      "**Lines are particles.** Straight lines with arrows are matter (fermions). Wavy, curly and dashed lines are force carriers (bosons).",
+      "**Vertices are interactions.** At each dot, particles are absorbed or emitted. Charge, energy and momentum are conserved at every vertex.",
+      "**External lines** stick out of the diagram. They're the real particles you send in and detect. **Internal lines** run between two vertices. They're *virtual* particles that are never observed and don't obey E² = p² + m².",
+    ])}
+    ${section("The key idea: perturbation theory", [
+      "Every vertex brings one factor of the coupling constant. In QED that's e, with α = e²/4π ≈ 1/137. Diagrams with more vertices are suppressed by more powers of α.",
+      "You can therefore start with the simplest diagrams (**tree level**) and add **loop** corrections for more precision. Each loop typically costs a factor of about α/π ≈ 0.002.",
+    ])}
+    <section class="prose"><h2>Where to go next</h2>
+      <p>• <a href="#lines">The cast of lines</a> — the visual vocabulary.</p>
+      <p>• <a href="#vertex">One vertex, six stories</a> — rotate a single vertex to see emission, absorption, pair creation and annihilation.</p>
+      <p>• <a href="#p-ee-mumu">Processes</a> — ten real processes. Click lines to inspect them and drag the time slice.</p>
+      <p>• <a href="#orders">Orders &amp; loops</a> — why perturbation theory works for QED but not for low-energy QCD.</p>
+      <p>• <a href="#quiz">Quiz</a> — test yourself.</p>
+    </section>
+  </article>`);
+  const range = root.querySelector("#intro-time"), stateEl = root.querySelector('[data-slot="state"]');
+  const view = diagramView(d, { onSlice: t => { time = t; refresh(); } });
+  root.querySelector('[data-slot="plate"]').replaceWith(plate(view));
+  range.addEventListener("input", () => { time = +range.value; refresh(); });
+  const describe = () => {
+    const present = edgesCrossing(d, time).map(e => e.label).join(",");
+    return { "e⁻,e⁺": "Before: an electron and a positron fly toward each other.", "γ*": "Middle: only a virtual photon exists. The pair has annihilated.",
+      "μ⁻,μ⁺": "After: a muon–antimuon pair flies apart." }[present] ?? "At a vertex: particles are being destroyed and created.";
+  };
+  function refresh() { view.update({ slice: time }); range.value = time; stateEl.textContent = describe(); Ask.refresh(); }
+  refresh();
+  return { el: root, context: () => ({
+    title: "What is a Feynman diagram?",
+    body: `Intro page. Explains that Feynman diagrams are pictures that stand for terms in a perturbative calculation of a scattering amplitude; lines are particles, vertices are interactions, external lines are real and internal lines virtual; time runs left to right; each vertex brings a power of the coupling (α ≈ 1/137 in QED). Shows e⁻e⁺ → μ⁻μ⁺ with a time slider. Current time slider: ${Math.round(time * 100)}%. ${describe()}`,
+    suggestions: ["Are virtual particles real?", "Why do we add amplitudes before squaring?", "Why does time run left to right here but upward in some books?"],
+  }) };
+}
+
+function linesPage() {
+  const root = el(`<article class="page">
+    ${section("The cast of lines", ["Each kind of particle has its own line style. Learn these and you can read almost any diagram in a particle physics paper."])}
+    <div class="cast"></div>
+    ${section("Particles vs antiparticles", ["A positron is drawn as an *electron line with the arrow pointing backward in time*. Feynman's (and Stückelberg's) insight was that an antiparticle moving forward in time is mathematically the same as a particle moving backward."])}
+    <div class="pair"></div>
+  </article>`);
+  const cast = root.querySelector(".cast");
+  for (const [key, s] of Object.entries(STYLES)) {
+    const row = el(`<div class="cast-row" style="--c: var(--${key})"><div class="plate"></div><div class="prose">
+      <h3>${esc(s.title)}</h3><p class="how">${esc(s.drawing)}</p><p class="math">${esc(s.examples)}</p><p class="muted">${md(s.summary)}</p></div></div>`);
+    row.querySelector(".plate").append(lineSample(key));
+    cast.append(row);
+  }
+  const pair = root.querySelector(".pair");
+  for (const [arrow, cap] of [["forward", "electron e⁻ →"], ["backward", "positron e⁺ →"]]) {
+    const f = el(`<figure><div class="plate"></div><figcaption class="math">${cap}</figcaption></figure>`);
+    f.querySelector(".plate").append(lineSample("fermion", arrow));
+    pair.append(f);
+  }
+  return { el: root, context: () => ({
+    title: "The cast of lines",
+    body: "Page listing line styles:\n" + Object.values(STYLES).map(s => `• ${s.title}: ${s.drawing}. ${s.examples}. ${s.summary}`).join("\n") + "\nAlso explains that a positron is an electron line with its arrow pointing backward in time.",
+    suggestions: ["Why does the fermion arrow point backward for antiparticles?", "Why can gluons interact with each other but photons can't?", "Why are the W and Z so heavy?"],
+  }) };
+}
+
+const LEG_OFFSETS = [210, 330, 90]; // incoming-arrow fermion, outgoing-arrow fermion, photon
+const STORIES = [
+  ["e⁻→e⁻γ", "An electron emits a photon", "The fermion arrow runs straight through: the electron continues on with less energy and recoils."],
+  ["e⁻γ→e⁻", "An electron absorbs a photon", "The time-reverse of emission. This is how atoms absorb light."],
+  ["e⁺→e⁺γ", "A positron emits a photon", "The fermion arrow now points backward in time, which is how a positron moving forward is drawn."],
+  ["e⁺γ→e⁺", "A positron absorbs a photon", "Same vertex, same rule: −ieγ^μ. Only the reading in time has changed."],
+  ["e⁻e⁺→γ", "Pair annihilation", "Electron and positron meet and become a photon. The arrow comes in on the electron and goes back out on the positron."],
+  ["γ→e⁻e⁺", "Pair creation", "A photon turns into matter and antimatter, E = mc² in action."],
+];
+const cosines = a => LEG_OFFSETS.map(o => Math.cos((o + a) * Math.PI / 180));
+function reading(a) {
+  const c = cosines(a), ini = [], fin = [], rank = { "e⁻": 0, "e⁺": 1, "γ": 2 };
+  if (c[0] < 0) ini.push("e⁻"); else fin.push("e⁺");
+  if (c[1] > 0) fin.push("e⁻"); else ini.push("e⁺");
+  if (c[2] < 0) ini.push("γ"); else fin.push("γ");
+  const sort = xs => xs.sort((x, y) => rank[x] - rank[y]);
+  return { ini: sort(ini), fin: sort(fin), key: sort(ini).join("") + "→" + sort(fin).join("") };
+}
+// For each story, the rotation where every leg is furthest from vertical.
+const PRESETS = (() => {
+  const best = {};
+  for (let a = 0; a < 360; a++) {
+    const k = reading(a).key, m = Math.min(...cosines(a).map(Math.abs));
+    if (!(k in best) || m > best[k][1]) best[k] = [a, m];
+  }
+  return Object.fromEntries(Object.entries(best).map(([k, v]) => [k, v[0]]));
+})();
+
+function vertexPage() {
+  let angle = 20, anim = null;
+  const aspect = 1.6, r = .38;
+  const build = () => {
+    const c = cosines(angle);
+    const leg = (id, off) => { const a = (off + angle) * Math.PI / 180; return X(id, .5 + r * Math.cos(a) / aspect, .5 - r * Math.sin(a)); };
+    return D({ id: "explorer", title: "", process: "", nodes: [V("v", .5, .5), leg("a", LEG_OFFSETS[0]), leg("b", LEG_OFFSETS[1]), leg("p", LEG_OFFSETS[2])],
+      edges: [E("a", "v", c[0] < 0 ? P.electron : P.positron, { arrow: "forward" }), E("v", "b", c[1] > 0 ? P.electron : P.positron, { arrow: "forward" }),
+        E("v", "p", P.photon)] });
+  };
+  const root = el(`<article class="page">
+    ${section("One vertex, six stories", ["QED has exactly **one** basic vertex: two fermion legs and one photon leg. Drag the diagram to rotate it, and read it with time running left to right. Legs on the left are *incoming*; legs on the right are *outgoing*."])}
+    <div class="explorer">
+      <div class="stage-main"><div data-slot="plate"></div>
+        <div class="controls"><label class="small muted" for="vx-angle">Rotate</label><input id="vx-angle" type="range" min="0" max="359" step="1"><span class="small" style="font-variant-numeric:tabular-nums;width:3.5em" data-slot="deg"></span></div>
+      </div>
+      <div class="inspector">
+        <h2 data-slot="title"></h2>
+        <div class="reading" data-slot="reading"></div>
+        <p class="small" data-slot="text"></p>
+        <div class="eyebrow">Jump to</div>
+        <div class="story-list"></div>
+      </div>
+    </div>
+    ${section("The catch", [
+      "None of these six processes can actually happen *on its own* with all three particles real. A free electron can't emit a real photon without breaking energy–momentum conservation. Every real process glues two or more vertices together with virtual lines, which are allowed to be off-shell.",
+      "This is **crossing symmetry**. One vertex rule describes every one of these processes. Their amplitudes are related by swapping incoming particles for outgoing antiparticles.",
+    ])}
+  </article>`);
+  const view = diagramView(build(), { timeArrow: true, pastFuture: true, sliceDraggable: false });
+  view.update({ slice: .5 });
+  root.querySelector('[data-slot="plate"]').replaceWith(plate(view));
+  const range = root.querySelector("#vx-angle");
+  const slot = n => root.querySelector(`[data-slot="${n}"]`);
+  const list = root.querySelector(".story-list");
+  for (const [key, title] of STORIES) {
+    const b = el(`<button class="linkbtn">${esc(title)}</button>`);
+    b.onclick = () => rotateTo(PRESETS[key]);
+    list.append(b);
+  }
+  // Drag anywhere on the diagram to rotate the vertex.
+  let grabOffset = 0;
+  // With the svg as drag container, ev.x/ev.y are viewBox units; the vertex sits at the frame's center.
+  const pointerAngle = ev => Math.atan2(-(ev.y - (40 + 712 / aspect / 2)), ev.x - 400) * 180 / Math.PI;
+  view.svg.call(d3.drag().container(view.node)
+    .on("start", ev => { cancelAnim(); grabOffset = pointerAngle(ev) - angle; })
+    .on("drag", ev => setAngle(pointerAngle(ev) - grabOffset)));
+  range.addEventListener("input", () => { cancelAnim(); setAngle(+range.value); });
+  function cancelAnim() { if (anim) { anim.stop(); anim = null; } }
+  function rotateTo(target) {
+    cancelAnim();
+    const from = angle, delta = ((target - from + 540) % 360) - 180;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setAngle(target); return; }
+    anim = d3.timer(el => { const k = Math.min(1, el / 600); setAngle(from + delta * d3.easeCubicInOut(k)); if (k === 1) cancelAnim(); });
+  }
+  function setAngle(a) {
+    angle = ((a % 360) + 360) % 360;
+    view.setDiagram(build());
+    view.update({ slice: .5 });
+    range.value = Math.round(angle);
+    slot("deg").textContent = Math.round(angle) + "°";
+    const rd = reading(angle), story = STORIES.find(s => s[0] === rd.key);
+    slot("title").textContent = story?.[1] ?? "—";
+    slot("reading").textContent = `${rd.ini.join(" + ")} → ${rd.fin.join(" + ")}`;
+    slot("text").textContent = story?.[2] ?? "";
+    Ask.refresh();
+  }
+  setAngle(angle);
+  return { el: root, destroy: cancelAnim, context: () => {
+    const rd = reading(angle), story = STORIES.find(s => s[0] === rd.key);
+    return { title: "One vertex, six stories",
+      body: `Interactive page: the single QED vertex (two fermion legs, one photon leg) rotated by dragging or a slider, read with time left to right. Legs on the left are incoming, on the right outgoing. Currently rotated to ${Math.round(angle)}°, which reads as "${story?.[1] ?? "?"}": ${rd.ini.join(" + ")} → ${rd.fin.join(" + ")}. The page notes none of the six readings can happen alone with all particles real, and mentions crossing symmetry.`,
+      suggestions: ["Why can't a free electron emit a real photon?", "What is crossing symmetry?", "How is this vertex used inside bigger diagrams?"] };
+  } };
+}
+
+function processPage(d) {
+  let selection = null, time = .02, showSlice = true, playing = false, raf = null, last = 0;
+  const it = INTERACTIONS[d.interaction];
+  const root = el(`<article class="page">
+    <header class="prose" style="max-width:none;gap:8px">
+      <div class="chips"><span class="chip" style="--c:${it.color}"><span class="math">${it.mark}</span>${esc(it.title)}</span>
+        <span class="chip">${d.loops === 0 ? "Tree level" : d.loops + "-loop"}</span></div>
+      <h1 class="process-title">${esc(d.process)}</h1>
+      <p class="lede">${esc(d.summary)}</p>
+    </header>
+    <div class="stage">
+      <div class="stage-main">
+        <div data-slot="plate"></div>
+        <div class="controls">
+          <label class="toggle"><input type="checkbox" id="pp-slice" checked> Time slice</label>
+          <button class="btn small" id="pp-play" aria-label="Play">▶ Play</button>
+          <input type="range" id="pp-time" min="0" max="1" step="0.001" aria-label="Time">
+        </div>
+        <div class="present-row" data-slot="present"></div>
+      </div>
+      <div class="inspector" data-slot="inspector" aria-live="polite"></div>
+    </div>
+    <section class="prose">${d.details.map(p => `<p>${md(p)}</p>`).join("")}</section>
+    <section class="prose" style="max-width:820px">
+      <h2>Putting the rules together</h2>
+      <p class="muted small">Multiply the factors for every line and vertex to get the amplitude 𝓜. The probability is ∝ |𝓜|².</p>
+      <div class="formula">${esc(d.amplitude)}</div>
+    </section>
+    <section class="stats">
+      <div class="stat"><span class="eyebrow">Vertices V</span><b>${d.vertices.length}</b><span class="small muted">amplitude ∝ g<sup>${d.vertices.length}</sup></span></div>
+      <div class="stat"><span class="eyebrow">Internal lines I</span><b>${d.internal.length}</b><span class="small muted">virtual particles</span></div>
+      <div class="stat"><span class="eyebrow">Loops L = I − V + 1</span><b>${d.loops}</b><span class="small muted">${d.loops === 0 ? "tree diagram" : "integrate over loop momentum"}</span></div>
+      <div class="stat"><span class="eyebrow">Rate</span><b>∝ g<sup>${2 * d.vertices.length}</sup></b><span class="small muted">|𝓜|² doubles the power</span></div>
+    </section>
+  </article>`);
+  const q = s => root.querySelector(s);
+  const view = diagramView(d, { selectable: true,
+    onSelect: s => { selection = s; refresh(); },
+    onSlice: t => { time = t; showSlice = true; refresh(); } });
+  q('[data-slot="plate"]').replaceWith(plate(view));
+  const sliceBox = q("#pp-slice"), playBtn = q("#pp-play"), range = q("#pp-time");
+  sliceBox.onchange = () => { showSlice = sliceBox.checked; if (!showSlice) stop(); refresh(); };
+  range.oninput = () => { time = +range.value; showSlice = true; refresh(); };
+  playBtn.onclick = () => (playing ? stop() : play());
+  function play() {
+    playing = true; showSlice = true; last = performance.now(); playBtn.textContent = "❚❚ Pause";
+    const step = now => { time += .00022 * (now - last); last = now; if (time > 1) time = 0; refresh(); if (playing) raf = requestAnimationFrame(step); };
+    raf = requestAnimationFrame(step);
+  }
+  function stop() { playing = false; cancelAnimationFrame(raf); playBtn.textContent = "▶ Play"; }
+
+  function inspectorHTML() {
+    if (selection?.edge != null) {
+      const e = d.edges[selection.edge], r = edgeRule(d, e);
+      return `<div style="display:flex;gap:12px;align-items:center"><span class="big" style="color:var(--${e.p.style})">${esc(e.p.symbol)}</span>
+        <div><b>${esc(e.p.name)}</b><div class="small muted">${esc(r.title)}</div></div></div>
+        <dl><dt>Charge</dt><dd>${esc(e.p.charge)}</dd><dt>Spin</dt><dd>${esc(e.p.spin)}</dd><dt>Mass</dt><dd>${esc(e.p.mass)}</dd></dl>
+        <p class="small">${esc(e.p.blurb)}</p>
+        <div class="eyebrow">Feynman rule</div><div class="formula">${esc(r.formula)}</div><p class="small">${md(r.text)}</p>`;
+    }
+    if (selection?.vertex) {
+      const r = vertexRule(d, selection.vertex);
+      return `<b style="font-size:17px">● ${esc(r.title)}</b>
+        <p class="small muted">Lines meeting here: <span class="math">${esc(d.edgesAt(selection.vertex).map(e => e.label).join(", "))}</span></p>
+        <div class="eyebrow">Feynman rule</div><div class="formula">${esc(r.formula)}</div><p class="small">${md(r.text)}</p>`;
+    }
+    return `<b>Inspect</b><p class="small muted">Click any <strong>line</strong> to see the particle and its Feynman rule, or click a <strong>vertex</strong> (dot) to see the interaction. Drag the dashed “now” line to move through time.</p>
+      <div><b class="small">Real (external) lines</b><div class="small muted">enter or leave the diagram</div></div>
+      <div><b class="small">Virtual (internal) lines</b><div class="small muted">connect two vertices</div></div>
+      <div><b class="small">Vertices</b><div class="small muted">where particles interact</div></div>`;
+  }
+  let lastInspector = "";
+  function refresh() {
+    view.update({ slice: showSlice ? time : null, selection });
+    sliceBox.checked = showSlice;
+    range.value = time; range.disabled = !showSlice; playBtn.disabled = !showSlice;
+    const present = q('[data-slot="present"]');
+    if (showSlice) {
+      const es = edgesCrossing(d, time);
+      present.innerHTML = `<span>At this instant:</span>` + (es.length ? es.map(e => {
+        const v = d.isInternal(e);
+        return `<span class="pill${v ? " virtual" : ""}" style="--c:var(--${e.p.style})">${esc(e.label)}${v ? " <small>virtual</small>" : ""}</span>`;
+      }).join("") : `<span>(at a vertex)</span>`);
+    } else present.innerHTML = "";
+    const html = inspectorHTML();
+    if (html !== lastInspector) { q('[data-slot="inspector"]').innerHTML = html; lastInspector = html; }
+    Ask.refresh();
+  }
+  refresh();
+  return { el: root, destroy: stop, context: () => {
+    const s = ["Walk me through this diagram step by step.", "Which particles here are virtual, and what does that mean?"];
+    if (selection?.edge != null) s.unshift(`Explain the Feynman rule for the ${d.edges[selection.edge].label} line I selected.`);
+    else if (selection?.vertex) s.unshift("What's conserved at the vertex I selected?");
+    else s.push("How would I compute a cross-section from this?");
+    return { title: d.title, body: diagramContext(d, selection, showSlice ? time : null), suggestions: s };
+  } };
+}
+
+function ordersPage() {
+  let logA = Math.log10(1 / 137.036);
+  const presets = [["QED (α ≈ 1/137)", 1 / 137.036], ["QCD at M_Z (α_s ≈ 0.118)", .118], ["QCD at ~1 GeV (α_s ≈ 0.5)", .5]];
+  const root = el(`<article class="page">
+    ${section("Orders & loops", ["A physical amplitude is an infinite sum over diagrams, organized by the number of vertices:"])}
+    <p class="series">𝓜 = 𝓜<sub>tree</sub> + 𝓜<sub>1-loop</sub> + 𝓜<sub>2-loop</sub> + …</p>
+    <div class="duo"></div>
+    ${section("Each loop costs a factor of about α/π", ["Adding a loop adds two vertices, which multiplies the amplitude by e² ∝ α. With the typical 1/π from the loop integral, each loop is suppressed by roughly **α/π**. Move the coupling and watch what happens to the series."])}
+    <div class="lab">
+      <div><b data-slot="alpha" style="font-variant-numeric:tabular-nums"></b> <span class="muted" data-slot="inv"></span></div>
+      <input type="range" id="ord-alpha" min="-2.3" max="0.3" step="0.005" aria-label="Coupling strength (log scale)">
+      <div class="presets"></div>
+      <div class="bars"></div>
+      <div class="verdict" data-slot="verdict"></div>
+    </div>
+    ${section("But the number of diagrams explodes", ["Number of QED diagrams contributing to the electron's anomalous magnetic moment (g − 2):"])}
+    <div class="counts">${[["1", 1], ["7", 2], ["72", 3], ["891", 4], ["12,672", 5]].map(([c, n]) => `<div class="count"><b>${c}</b><span>${n} loop${n === 1 ? "" : "s"}</span></div>`).join("")}</div>
+    ${section("", ["In QED the terms shrink much faster than the diagram count grows, so a few loops already give extraordinary precision. In low-energy QCD, α_s ~ 1 and higher loops are just as big as lower ones. Diagrams stop being useful, and physicists turn to **lattice QCD** and supercomputers instead."])}
+  </article>`);
+  const duo = root.querySelector(".duo");
+  for (const [d, cap] of [[byId("moller"), "Tree level: 2 vertices, 𝓜 ∝ e²"], [byId("vacpol"), "One loop: 4 vertices, 𝓜 ∝ e⁴"]]) {
+    const f = el(`<figure><div class="plate"></div><figcaption>${cap}</figcaption></figure>`);
+    f.querySelector(".plate").append(diagramView(d, { timeArrow: false }).node);
+    duo.append(f);
+  }
+  const range = root.querySelector("#ord-alpha"), slot = n => root.querySelector(`[data-slot="${n}"]`);
+  const pres = root.querySelector(".presets");
+  for (const [label, a] of presets) {
+    const b = el(`<button class="btn small">${esc(label)}</button>`);
+    b.onclick = () => { logA = Math.log10(a); refresh(); };
+    pres.append(b);
+  }
+  const bars = root.querySelector(".bars");
+  const rows = d3.range(5).map(L => {
+    const r = el(`<div class="bar"><span>${L === 0 ? "tree" : L + "-loop"}</span><div class="track"><div class="fill"></div></div><span class="val"></span></div>`);
+    bars.append(r); return r;
+  });
+  const scale = d3.scaleLog().domain([1e-10, 1]).range([1, 100]).clamp(true);
+  range.oninput = () => { logA = +range.value; refresh(); };
+  function refresh() {
+    const a = 10 ** logA, r = a / Math.PI;
+    range.value = logA;
+    slot("alpha").textContent = `Coupling α = ${a.toFixed(4)}`;
+    slot("inv").textContent = `(≈ 1/${Math.round(1 / a)})`;
+    rows.forEach((row, L) => {
+      const v = r ** L;
+      const fill = row.querySelector(".fill");
+      fill.style.width = scale(v) + "%";
+      fill.classList.toggle("hot", L > 0 && v > .3);
+      row.querySelector(".val").textContent = v >= .001 ? v.toFixed(3) : v.toExponential(1);
+    });
+    const v = slot("verdict");
+    if (r < .01) { v.style.color = "var(--good)"; v.textContent = `✓ Converges fast: each loop is ~${Math.round(1 / r)}× smaller. Perturbation theory works beautifully.`; }
+    else if (r < .1) { v.style.color = "var(--warn)"; v.textContent = "⚠ Still useful, but you need several loops for precision (typical of high-energy QCD)."; }
+    else { v.style.color = "var(--bad)"; v.textContent = "✕ Loops aren't small. The series is useless here, so you need non-perturbative methods."; }
+    Ask.refresh();
+  }
+  refresh();
+  return { el: root, context: () => ({
+    title: "Orders & loops",
+    body: `Page on perturbation theory: amplitude = tree + 1-loop + 2-loop + …, each loop suppressed by ~α/π. Shows Møller scattering (tree) and vacuum polarization (1 loop), a coupling slider with bars for (α/π)^L, and the count of QED diagrams for electron g−2 by loop order (1, 7, 72, 891, 12,672). The slider is currently at α = ${(10 ** logA).toFixed(4)}, so α/π = ${(10 ** logA / Math.PI).toFixed(4)}.`,
+    suggestions: ["Why is each loop suppressed by about α/π?", "What is lattice QCD and why is it needed?", "Does the perturbation series actually converge?"],
+  }) };
+}
+
+function makeQuestion() {
+  const d = CATALOG[Math.floor(Math.random() * CATALOG.length)];
+  const v = d.vertices.length, i = d.internal.length;
+  const shuffle = xs => xs.map(x => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  switch (Math.floor(Math.random() * 5)) {
+    case 0: return { d, prompt: "How many vertices does this diagram have?", options: ["2", "3", "4", "5"], answer: String(v),
+      explanation: `Count the dots where lines meet: V = ${v}. The amplitude carries ${v} powers of the coupling.` };
+    case 1: return { d, prompt: "How many loops does this diagram have?", options: ["0 (tree)", "1", "2"], answer: d.loops === 0 ? "0 (tree)" : String(d.loops),
+      explanation: `L = I − V + 1 = ${i} − ${v} + 1 = ${d.loops}.` };
+    case 2: return { d, prompt: "Which interaction is this diagram mainly about?", options: Object.values(INTERACTIONS).map(x => x.title), answer: INTERACTIONS[d.interaction].title,
+      explanation: `Look at the boson lines: wavy = photon, curly = gluon, long wavy = W/Z, dashed = Higgs. This one is ${d.title}.` };
+    case 3: {
+      const others = shuffle([...new Set(CATALOG.map(x => x.process))].filter(p => p !== d.process)).slice(0, 3);
+      return { d, prompt: "Which process is this? (labels hidden)", options: shuffle([d.process, ...others]), answer: d.process,
+        explanation: `${d.title}: ${d.summary}`, hideLabels: true };
+    }
+    default: return { d, prompt: "How many virtual (internal) lines are there?", options: ["1", "2", "3", "4"], answer: String(i),
+      explanation: `Internal lines connect two vertices. Here there are ${i}.` };
+  }
+}
+const quizScore = { right: 0, asked: 0 };
+function quizPage() {
+  let qn = makeQuestion(), chosen = null;
+  const root = el(`<article class="page">
+    <div class="quiz-head"><h1>Quiz</h1><span class="score" data-slot="score"></span></div>
+    <div data-slot="plate" style="max-width:780px"></div>
+    <h2 data-slot="prompt"></h2>
+    <div class="options"></div>
+    <div class="feedback" data-slot="feedback"></div>
+  </article>`);
+  const slot = n => root.querySelector(`[data-slot="${n}"]`);
+  function render() {
+    slot("score").textContent = `Score: ${quizScore.right} / ${quizScore.asked}`;
+    const p = plate(diagramView(qn.d, { labels: !qn.hideLabels }));
+    p.dataset.slot = "plate"; p.style.maxWidth = "780px";
+    slot("plate").replaceWith(p);
+    slot("prompt").textContent = qn.prompt;
+    const opts = root.querySelector(".options");
+    opts.replaceChildren(...qn.options.map(o => {
+      const b = el(`<button class="option"><span>${esc(o)}</span><span></span></button>`);
+      if (chosen) {
+        b.disabled = true;
+        if (o === qn.answer) { b.classList.add("right"); b.lastChild.textContent = "✓"; }
+        else if (o === chosen) { b.classList.add("wrong"); b.lastChild.textContent = "✕"; }
+      }
+      b.onclick = () => { chosen = o; quizScore.asked++; if (o === qn.answer) quizScore.right++; render(); };
+      return b;
+    }));
+    const fb = slot("feedback");
+    if (chosen) {
+      const ok = chosen === qn.answer;
+      fb.innerHTML = `<p class="verdict ${ok ? "ok" : "no"}">${ok ? "Correct!" : `Not quite — the answer is ${esc(qn.answer)}.`}</p><p>${esc(qn.explanation)}</p>`;
+      const next = el(`<button class="btn primary" style="justify-self:start">Next question</button>`);
+      next.onclick = () => { qn = makeQuestion(); chosen = null; render(); };
+      fb.append(next);
+      next.focus();
+    } else fb.replaceChildren();
+    Ask.refresh();
+  }
+  render();
+  return { el: root, context: () => ({
+    title: "Quiz",
+    body: `Quiz page. Current question: "${qn.prompt}" about this diagram:\n${diagramContext(qn.d, null, null)}\nOptions: ${qn.options.join(" | ")}.` +
+      (chosen == null ? "\nThe student hasn't answered yet. Give hints, but don't reveal the answer or which option is correct."
+        : `\nThe student answered "${chosen}"; the correct answer is "${qn.answer}". ${qn.explanation}`),
+    suggestions: chosen == null ? ["Can you give me a hint?", "How do I count loops?"] : ["Why is that the answer?", "Give me a harder question like this one."],
+  }) };
+}
+
+/* ---------- Ask Claude drawer ---------- */
+const Ask = (() => {
+  const app = document.getElementById("app"), panel = document.getElementById("ask"), toggle = document.getElementById("ask-toggle");
+  const log = document.getElementById("ask-log"), chips = document.getElementById("ask-chips"), about = document.getElementById("ask-about");
+  const form = document.getElementById("ask-form"), box = document.getElementById("ask-text"), sendBtn = document.getElementById("ask-send");
+  const convos = new Map();
+  let sample = null, ctl = null, busy = false, disabled = null, lastKey = "";
+
+  const RULES = `You are a friendly physics tutor inside an interactive web page that teaches Feynman diagrams. Each question arrives with a description of the page the student is looking at, inside <page> tags; it reflects what's on screen right now (selected lines, time slider, quiz state). Ground your answer in that page.
+
+Pitch answers at a curious undergraduate unless the student asks for more or less depth. The answer appears in a narrow side panel, so keep it short: usually one to three brief paragraphs. Formatting: **bold**, *italics* and \`code\` render; headings, tables and LaTeX don't, so write math in plain Unicode (α, γ^μ, q², ∫d⁴k) and use simple "•" lines for lists. If the page says the student hasn't answered a quiz question yet, help them reason without giving away the answer.`;
+
+  const ctx = () => (current?.context?.() ?? { title: "", body: "", suggestions: [] });
+  const turns = title => { if (!convos.has(title)) convos.set(title, []); return convos.get(title); };
+
+  if (window.claude?.use) {
+    window.claude.use("sample").then(s => { sample = s; toggle.hidden = !s; }).catch(() => {});
+  }
+
+  function setOpen(open) {
+    panel.hidden = !open;
+    app.classList.toggle("ask-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    if (open) { render(); box.focus(); }
+  }
+  toggle.onclick = () => setOpen(panel.hidden);
+  document.getElementById("ask-close").onclick = () => { setOpen(false); toggle.focus(); };
+  document.getElementById("ask-clear").onclick = () => { ctl?.abort(); convos.set(ctx().title, []); render(); };
+  document.addEventListener("keydown", e => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k" && sample) { e.preventDefault(); setOpen(panel.hidden); }
+    if (e.key === "Escape" && !panel.hidden && matchMedia("(max-width: 880px)").matches) setOpen(false);
+  });
+  box.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
+  box.addEventListener("input", () => { box.style.height = "auto"; box.style.height = Math.min(box.scrollHeight, 140) + "px"; });
+  form.onsubmit = e => {
+    e.preventDefault();
+    if (busy) { ctl?.abort(); return; }
+    const q = box.value.trim();
+    if (q) { box.value = ""; box.style.height = "auto"; ask(q); }
+  };
+
+  const ERRORS = {
+    rate_limited: "Too many questions at once. Wait a moment, then ask again.",
+    session_expired: "Your claude.ai session ended. Sign in again, then ask again.",
+    refused: "Claude declined to answer that. Try rephrasing the question.",
+    prompt_too_large: "That conversation is too long to send. Clear it and ask again.",
+    empty_completion: "Claude didn't produce an answer. Try asking a different way.",
+  };
+  const PERMANENT = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"];
+
+  async function ask(q) {
+    if (!sample || busy || disabled) return;
+    const c = ctx(), list = turns(c.title);
+    const sent = `<page title="${c.title}">\n${c.body}\n</page>\n\n${q}`;
+    const history = [];
+    for (let i = 0; i + 1 < list.length; i += 2) {
+      const u = list[i], a = list[i + 1];
+      if (!a.error && a.text) history.push({ role: "user", content: u.sent }, { role: "assistant", content: a.text });
+    }
+    const user = { role: "user", text: q, sent }, reply = { role: "assistant", text: "", pending: true };
+    list.push(user, reply);
+    busy = true; ctl = new AbortController(); render();
+    try {
+      const res = await sample([{ role: "user", content: RULES }, ...history.slice(-20), { role: "user", content: sent }], {
+        cache: false, signal: ctl.signal, onText: ({ text }) => { reply.text = text; reply.pending = false; renderLog(); } });
+      reply.text = res.text;
+      if (res.truncated) reply.note = "This answer was cut short. Ask for less at a time.";
+    } catch (e) {
+      const code = e?.code ?? "upstream_error";
+      reply.text = code === "refused" ? "" : (e?.text ?? reply.text);
+      if (code === "cancelled") { reply.note = "Stopped."; if (!reply.text) reply.error = true; }
+      else if (PERMANENT.includes(code)) { disabled = "Claude isn't available on this page for your account."; reply.error = true; reply.text = disabled; }
+      else {
+        const msg = ERRORS[code] ?? "Something went wrong reaching Claude. Ask again in a moment.";
+        if (reply.text) reply.note = msg; else { reply.text = msg; reply.error = true; }
+      }
+    } finally {
+      reply.pending = false; busy = false; ctl = null; render();
+    }
+  }
+
+  function renderLog() {
+    const c = ctx(), list = turns(c.title);
+    log.replaceChildren();
+    if (!list.length) {
+      const s = el(`<div class="suggest"><p class="small muted">Ask anything about what's on screen. Claude sees this page, including what you've selected.</p></div>`);
+      for (const q of c.suggestions ?? []) { const b = el(`<button>${esc(q)}</button>`); b.onclick = () => ask(q); s.append(b); }
+      log.append(s);
+    }
+    for (const t of list) {
+      if (t.role === "user") log.append(el(`<div class="msg user">${esc(t.text)}</div>`));
+      else if (t.pending) log.append(el(`<div class="msg thinking">Thinking…</div>`));
+      else log.append(el(`<div class="msg${t.error ? " error" : ""}">${md(t.text)}${t.note && !t.error ? `<span class="note">${esc(t.note)}</span>` : ""}</div>`));
+    }
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function render() {
+    if (panel.hidden) return;
+    const c = ctx();
+    about.textContent = "About: " + (c.title || "this page");
+    renderLog();
+    chips.replaceChildren();
+    if (turns(c.title).length && !busy) {
+      for (const q of c.suggestions ?? []) { const b = el(`<button>${esc(q)}</button>`); b.onclick = () => ask(q); chips.append(b); }
+    }
+    sendBtn.textContent = busy ? "Stop" : "Send";
+    box.disabled = !!disabled;
+    lastKey = c.title + "|" + (c.suggestions ?? []).join("|");
+  }
+
+  // Pages call this when their state changes; only redraw when suggestions or the page actually changed.
+  function refresh() {
+    if (panel.hidden || busy) return;
+    const c = ctx();
+    if (c.title + "|" + (c.suggestions ?? []).join("|") !== lastKey) render();
+  }
+
+  return { refresh, render };
+})();
+
+/* ---------- routing ---------- */
+const ROUTES = [
+  { id: "intro", group: "Learn", title: "What is a Feynman diagram?", mark: "◇", make: introPage },
+  { id: "lines", group: "Learn", title: "The cast of lines", mark: "∿", make: linesPage },
+  { id: "vertex", group: "Learn", title: "One vertex, six stories", mark: "Y", make: vertexPage },
+  ...CATALOG.map(d => ({ id: "p-" + d.id, group: "Processes", title: d.title, sub: d.process, mark: INTERACTIONS[d.interaction].mark,
+    color: INTERACTIONS[d.interaction].color, make: () => processPage(d) })),
+  { id: "orders", group: "Go deeper", title: "Orders & loops", mark: "Σ", make: ordersPage },
+  { id: "quiz", group: "Go deeper", title: "Quiz", mark: "?", make: quizPage },
+];
+let current = null;
+(function buildNav() {
+  const nav = document.getElementById("nav"), sel = document.getElementById("nav-select");
+  for (const group of [...new Set(ROUTES.map(r => r.group))]) {
+    const g = el(`<div class="nav-group"><div class="eyebrow">${esc(group)}</div></div>`);
+    const og = el(`<optgroup label="${esc(group)}"></optgroup>`);
+    for (const r of ROUTES.filter(r => r.group === group)) {
+      g.append(el(`<a href="#${r.id}" data-id="${r.id}" style="${r.color ? `--c:${r.color}` : ""}"><span class="dotmark">${esc(r.mark)}</span>
+        <span class="label">${esc(r.title)}${r.sub ? `<span class="sub">${esc(r.sub)}</span>` : ""}</span></a>`));
+      og.append(el(`<option value="${r.id}">${esc(r.title)}</option>`));
+    }
+    nav.append(g); sel.append(og);
+  }
+  sel.onchange = () => { location.hash = sel.value; };
+})();
+function route() {
+  const id = location.hash.slice(1) || "intro";
+  const r = ROUTES.find(x => x.id === id) ?? ROUTES[0];
+  current?.destroy?.();
+  current = null;
+  const page = r.make();
+  current = page;
+  document.getElementById("page").replaceChildren(page.el);
+  document.querySelectorAll("#nav a").forEach(a => { if (a.dataset.id === r.id) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  document.getElementById("nav-select").value = r.id;
+  window.scrollTo(0, 0);
+  Ask.render();
+}
+window.addEventListener("hashchange", route);
+route();
+</script>
