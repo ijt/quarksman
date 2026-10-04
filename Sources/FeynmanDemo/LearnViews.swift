@@ -71,6 +71,8 @@ struct IntroView: View {
                     "**On-shell and off-shell.** A real particle's energy and momentum always satisfy E² = p² + m² (in units where c = 1). Plotted in energy–momentum space, the allowed points form a curved surface called the **mass shell**. Real particles are **on-shell**. Virtual particles can be **off-shell**: energy and momentum are still conserved at every vertex, but the particle doesn't have the \"right\" mass for its momentum. Diagrams often write this using q² = E² − p², so on-shell means q² = m².",
                 ])
 
+                MassShellView()
+
                 Section_("The key idea: perturbation theory", [
                     "Every vertex brings one factor of the coupling constant. In QED that's e, with α = e²/4π ≈ 1/137. Diagrams with more vertices are suppressed by more powers of α.",
                     "You can therefore start with the simplest diagrams (**tree level**) and add **loop** corrections for more precision. Each loop typically costs a factor of about α/π ≈ 0.002.",
