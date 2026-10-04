@@ -17,4 +17,12 @@ final class GameProgressionTests: XCTestCase {
         XCTAssertEqual(all.count, Set(all).count)
         XCTAssertEqual(Set(all), Set(Species.allCases))
     }
+
+    func testVirtualLinesAreStarredWithoutChargeSigns() {
+        XCTAssertEqual(Species.e.virtualSymbol, "e*")
+        XCTAssertEqual(Species.mu.virtualSymbol, "μ*")
+        XCTAssertEqual(Species.photon.virtualSymbol, "γ*")
+        XCTAssertEqual(Species.t.virtualSymbol, "t*")
+        XCTAssertTrue(Species.allCases.allSatisfy { $0.virtualSymbol.hasSuffix("*") })
+    }
 }

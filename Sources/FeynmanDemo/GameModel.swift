@@ -57,6 +57,18 @@ enum Species: String, CaseIterable, Codable {
         }
     }
 
+    /// Label for an internal (virtual) line, e.g. e* or γ*. Fermions drop the charge sign because
+    /// the same line reads as a particle one way and its antiparticle the other.
+    var virtualSymbol: String {
+        switch self {
+        case .e: return "e*"
+        case .mu: return "μ*"
+        case .nuE: return "νₑ*"
+        case .nuMu: return "νμ*"
+        default: return symbol() + "*"
+        }
+    }
+
     /// The name with "a" or "an", for messages.
     var aName: String { (["electron", "electron neutrino", "up quark"].contains(name) ? "an " : "a ") + name }
 

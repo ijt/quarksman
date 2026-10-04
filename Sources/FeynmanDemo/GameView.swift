@@ -282,7 +282,7 @@ struct GameView: View {
                         Button { game.choose(s) } label: {
                             HStack(spacing: 6) {
                                 LineSample(style: s.style).frame(width: 64, height: 22)
-                                Text(s.symbol()).font(.system(.body, design: .serif).weight(.semibold))
+                                Text(s.virtualSymbol).font(.system(.body, design: .serif).weight(.semibold))
                             }
                             .padding(.horizontal, 10).padding(.vertical, 6)
                             .background(RoundedRectangle(cornerRadius: 8)
@@ -577,7 +577,7 @@ struct GameBoardView: View {
             if !isExternal {
                 let (p, t) = g.locate(g.length / 2)
                 let d: CGFloat = e.species.isFermion ? 15 : 19
-                ctx.draw(Text(e.species.symbol()).font(.system(size: 14, weight: .semibold, design: .serif))
+                ctx.draw(Text(e.species.virtualSymbol).font(.system(size: 14, weight: .semibold, design: .serif))
                             .foregroundStyle(e.species.style.color),
                          at: CGPoint(x: p.x - t.dy * d, y: p.y + t.dx * d))
             }
