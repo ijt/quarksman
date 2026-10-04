@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct ChatTurn: Identifiable, Equatable {
-    let id = UUID()
+struct ChatTurn: Identifiable, Equatable, Codable {
+    var id = UUID()
     let role: String // "user" or "assistant"
     /// What the user typed (shown in the UI).
     var text: String
@@ -18,6 +18,47 @@ final class AskModel {
     private var task: Task<Void, Never>?
     /// Identifies the in-flight request, so a stopped one can't touch state owned by a newer one.
     private var requestID: UUID?
+    /// The reply being streamed, so stopping can mark it if nothing arrived.
+    private var pendingReply: (page: String, id: UUID)?
+
+    /// Conversations survive relaunches in ~/Library/Application Support/FeynmanDemo/conversations.json.
+    private static let fileURL = URL.applicationSupportDirectory
+        .appending(path: "FeynmanDemo", directoryHint: .isDirectory)
+        .appending(path: "conversations.json")
+
+    init() {
+        load()
+        // Keep whatever has streamed so far if the app quits mid-answer.
+        NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.save() }
+        }
+    }
+
+    private func load() {
+        guard let data = try? Data(contentsOf: Self.fileURL),
+              let saved = try? JSONDecoder().decode([String: [ChatTurn]].self, from: data) else { return }
+        conversations = saved.mapValues { turns in
+            turns.map { turn in
+                var turn = turn
+                if turn.role == "assistant" && turn.text.isEmpty { Self.markStopped(&turn) }
+                return turn
+            }
+        }
+    }
+
+    private func save() {
+        do {
+            try FileManager.default.createDirectory(at: Self.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try JSONEncoder().encode(conversations).write(to: Self.fileURL, options: .atomic)
+        } catch {
+            print("Couldn't save conversations: \(error)")
+        }
+    }
+
+    private static func markStopped(_ turn: inout ChatTurn) {
+        turn.text = "Stopped before Claude answered."
+        turn.isError = true
+    }
 
     private static let system = """
     You are a friendly physics tutor inside a macOS app that teaches Feynman diagrams. \
@@ -36,13 +77,18 @@ final class AskModel {
     func clear(page: String) {
         stop()
         conversations[page] = []
+        save()
     }
 
     func stop() {
+        guard let pending = pendingReply else { return }
         task?.cancel()
         task = nil
         requestID = nil
+        pendingReply = nil
         isStreaming = false
+        updateReply(pending.id, on: pending.page) { if $0.text.isEmpty { Self.markStopped(&$0) } }
+        save()
     }
 
     /// Updates a reply by id; does nothing if it was cleared away in the meantime.
@@ -71,6 +117,7 @@ final class AskModel {
 
         let request = UUID()
         requestID = request
+        pendingReply = (page, reply.id)
         isStreaming = true
         task = Task {
             do {
@@ -90,7 +137,9 @@ final class AskModel {
             }
             if requestID == request {
                 requestID = nil
+                pendingReply = nil
                 isStreaming = false
+                save()
             }
         }
     }
