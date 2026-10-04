@@ -60,6 +60,15 @@ extension View {
         }
     }
 
+    /// Removes the view on iOS, e.g. a heading that repeats the large navigation title there.
+    @ViewBuilder func hiddenOnIOS(_ hidden: Bool = true) -> some View {
+        #if os(iOS)
+        if !hidden { self }
+        #else
+        self
+        #endif
+    }
+
     /// Link-looking buttons on macOS; plain borderless buttons elsewhere.
     @ViewBuilder func linkButtonStyle() -> some View {
         #if os(macOS)

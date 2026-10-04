@@ -52,7 +52,7 @@ struct QuizView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 HStack {
-                    Text("Quiz").font(.largeTitle.bold())
+                    Text("Quiz").font(.largeTitle.bold()).hiddenOnIOS()
                     Spacer()
                     Text("Score: \(score) / \(asked)").font(.title3.monospacedDigit()).foregroundStyle(.secondary)
                 }

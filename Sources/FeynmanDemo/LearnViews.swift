@@ -3,10 +3,18 @@ import SwiftUI
 struct Section_: View {
     let title: String
     let paragraphs: [String]
-    init(_ title: String, _ paragraphs: [String]) { self.title = title; self.paragraphs = paragraphs }
+    /// The title repeats the page's navigation title, so iOS (which shows that title large) can drop it.
+    var isPageTitle = false
+    init(_ title: String, isPageTitle: Bool = false, _ paragraphs: [String]) {
+        self.title = title
+        self.paragraphs = paragraphs
+        self.isPageTitle = isPageTitle
+    }
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.title2.bold())
+            if !title.isEmpty {
+                Text(title).font(.title2.bold()).hiddenOnIOS(isPageTitle)
+            }
             ForEach(paragraphs, id: \.self) { Text(LocalizedStringKey($0)) }
         }
         .textSelection(.enabled)
@@ -114,7 +122,7 @@ struct LinesView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Section_("The cast of lines", [
+                Section_("The cast of lines", isPageTitle: true, [
                     "Each kind of particle has its own line style. Learn these and you can read almost any diagram in a particle physics paper.",
                 ])
 
@@ -267,7 +275,7 @@ struct VertexExplorerView: View {
         let story = Self.stories.first { $0.key == Self.key(reading) }
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Section_("One vertex, six stories", [
+                Section_("One vertex, six stories", isPageTitle: true, [
                     "QED has exactly **one** basic vertex: two fermion legs and one photon leg. Rotate it, and read it with time running left to right. Legs on the left are *incoming*; legs on the right are *outgoing*.",
                 ])
 

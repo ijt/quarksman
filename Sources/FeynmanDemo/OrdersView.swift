@@ -16,7 +16,7 @@ struct OrdersView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                Section_("Orders & loops", [
+                Section_("Orders & loops", isPageTitle: true, [
                     "A physical amplitude is an infinite sum over diagrams, organized by the number of vertices:",
                 ])
                 Text("𝓜 = 𝓜_tree + 𝓜_1-loop + 𝓜_2-loop + …")
