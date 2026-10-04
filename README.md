@@ -52,6 +52,7 @@ Conversations are saved per page in `~/Library/Application Support/FeynmanDemo/c
 
 - `Sources/FeynmanDemo/`: all the app code, shared by both platforms.
 - `Package.swift`: builds the macOS app with SwiftPM.
+- `Tools/MakeIcon.swift`: draws the app icon. Run `swift Tools/MakeIcon.swift` to regenerate both the iOS and macOS versions.
 - `project.yml`: generates `FeynmanDemo.xcodeproj` for iOS with [XcodeGen](https://github.com/yonaskolb/XcodeGen). After adding or removing source files, run:
 
   ```sh
