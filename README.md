@@ -1,4 +1,4 @@
-# Feynman Diagrams
+# Quarksman
 
 An interactive SwiftUI app for learning to read Feynman diagrams, for macOS, iPhone and iPad.
 
@@ -46,7 +46,7 @@ Ask Claude needs an [Anthropic API key](https://console.anthropic.com/).
 - **macOS**: set `ANTHROPIC_API_KEY` in the environment before `swift run`, or enter a key in **Settings** (⌘,). Settings stores it in your keychain.
 - **iOS**: open the Ask panel and tap the key button.
 
-Conversations are saved per page in `~/Library/Application Support/FeynmanDemo/conversations.json` (inside the app's container on iOS) and restored on launch.
+Conversations are saved per page in `~/Library/Application Support/Quarksman/conversations.json` (inside the app's container on iOS) and restored on launch.
 
 ## Project layout
 

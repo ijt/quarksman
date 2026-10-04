@@ -121,7 +121,7 @@ struct ClaudeClient {
 
 /// Stores the API key in the login keychain.
 enum KeychainKey {
-    private static let service = "FeynmanDemo.anthropic-api-key"
+    private static let service = "Quarksman.anthropic-api-key"
 
     static func load() -> String? {
         let query: [String: Any] = [

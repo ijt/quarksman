@@ -21,9 +21,9 @@ final class AskModel {
     /// The reply being streamed, so stopping can mark it if nothing arrived.
     private var pendingReply: (page: String, id: UUID)?
 
-    /// Conversations survive relaunches in ~/Library/Application Support/FeynmanDemo/conversations.json.
+    /// Conversations survive relaunches in ~/Library/Application Support/Quarksman/conversations.json.
     private static let fileURL = URL.applicationSupportDirectory
-        .appending(path: "FeynmanDemo", directoryHint: .isDirectory)
+        .appending(path: "Quarksman", directoryHint: .isDirectory)
         .appending(path: "conversations.json")
 
     init() {
@@ -63,7 +63,7 @@ final class AskModel {
     }
 
     private static let system = """
-    You are a friendly physics tutor inside a macOS app that teaches Feynman diagrams. \
+    You are a friendly physics tutor inside Quarksman, an app that teaches Feynman diagrams. \
     Each question arrives with a description of the page the student is looking at, inside <page> tags; \
     it reflects what's on screen right now (selected lines, time slider, quiz state). Ground your answer in that page.
 

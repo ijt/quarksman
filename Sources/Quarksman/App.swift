@@ -12,7 +12,7 @@ struct QuarksmanApp: App {
     @State private var find = FindModel()
 
     var body: some Scene {
-        WindowGroup("Feynman Diagrams") {
+        WindowGroup("Quarksman") {
             ContentView()
                 .environment(find)
                 #if os(macOS)
