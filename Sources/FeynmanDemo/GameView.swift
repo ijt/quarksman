@@ -551,8 +551,11 @@ struct GameBoardView: View {
         ctx.draw(Text("time").font(.caption2).foregroundStyle(.secondary), at: CGPoint(x: frame.midX + 46, y: frame.maxY + 14), anchor: .leading)
 
         if board.vertices.isEmpty {
-            ctx.draw(Text("Tap to add a vertex · drag between dots to connect").font(.callout).foregroundStyle(.tertiary),
-                     at: CGPoint(x: frame.midX, y: frame.midY))
+            // Two short lines so the hint fits on a phone-width board.
+            ctx.draw(Text("Tap to add a vertex").font(.footnote).foregroundStyle(.tertiary),
+                     at: CGPoint(x: frame.midX, y: frame.midY - 11))
+            ctx.draw(Text("Drag between dots to connect").font(.footnote).foregroundStyle(.tertiary),
+                     at: CGPoint(x: frame.midX, y: frame.midY + 11))
         }
 
         for e in board.edges {
