@@ -190,9 +190,9 @@ struct GameView: View {
             .padding(24)
             .frame(maxWidth: 900, alignment: .leading)
         }
-        .navigationTitle("Diagram Builder")
+        .navigationTitle("Diagram Builder Game")
         .pageContext(PageContext(
-            title: "Diagram Builder",
+            title: "Diagram Builder Game",
             body: game.contextText,
             suggestions: game.solved
                 ? ["Why does this diagram work?", "Is there another valid diagram for this process?"]

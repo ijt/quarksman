@@ -78,7 +78,7 @@ struct ContentView: View {
                 Section("Go deeper") {
                     Label("Orders & loops", systemImage: "chart.bar.xaxis").tag(Page.orders)
                     Label("Quiz", systemImage: "questionmark.circle").tag(Page.quiz)
-                    Label("Diagram Builder", systemImage: "puzzlepiece.extension").tag(Page.game)
+                    Label("Diagram Builder Game", systemImage: "puzzlepiece.extension").tag(Page.game)
                 }
             }
             .navigationSplitViewColumnWidth(min: 230, ideal: 260)
