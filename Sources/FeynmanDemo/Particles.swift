@@ -60,7 +60,7 @@ enum LineStyle: String, CaseIterable, Identifiable {
         case .fermion:
             return "The arrow tracks the flow of particle number, not the direction of motion. An arrow pointing forward in time is a particle; an arrow pointing backward in time is its antiparticle moving forward. Arrows never start or stop at a vertex — fermion lines are continuous."
         case .photon:
-            return "Couples to electric charge with strength e (α = e²/4π ≈ 1/137). Photons are neutral, so two photons never meet at a vertex."
+            return "Couples to electric charge with strength e, the elementary charge (≈ 0.30 in natural units, so α = e²/4π ≈ 1/137). Photons are neutral, so two photons never meet at a vertex."
         case .gluon:
             return "Couples to color charge with strength g_s. Gluons carry color themselves, so there are three- and four-gluon vertices. This self-interaction leads to confinement."
         case .weak:

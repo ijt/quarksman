@@ -74,7 +74,7 @@ struct IntroView: View {
                 MassShellView()
 
                 Section_("The key idea: perturbation theory", [
-                    "Every vertex brings one factor of the coupling constant. In QED that's e, with α = e²/4π ≈ 1/137. Diagrams with more vertices are suppressed by more powers of α.",
+                    "Every vertex brings one factor of the coupling constant. In QED that's the electron's charge e (the elementary charge, not Euler's number 2.718…). In the units physicists use here, e is a pure number, about 0.30, and the fine-structure constant is α = e²/4π ≈ 1/137. Diagrams with more vertices are suppressed by more powers of α.",
                     "You can therefore start with the simplest diagrams (**tree level**) and add **loop** corrections for more precision. Each loop typically costs a factor of about α/π ≈ 0.002.",
                 ])
 
