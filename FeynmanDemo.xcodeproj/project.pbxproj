@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1341EAB591E317F6393D6313 /* DiagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5C7A032093C0E7B18A8D8 /* DiagramView.swift */; };
 		1BE9C7B24B5BBA921CE1C7A5 /* FeynmanRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8428C355656204FE424093 /* FeynmanRules.swift */; };
+		219E0DB177385FCC0A4AD455 /* Find.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F3B1B7ACA5D44D320F78FA /* Find.swift */; };
 		29E62623C7FE65E4C669ED37 /* AskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB87762C971AC728BC722511 /* AskView.swift */; };
 		3E801B317D66C47207F7190E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33AD25B58ACE3B7ED7D2DD0E /* App.swift */; };
 		4267C77A57EF1031EDD67CCC /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFEE8D6AA11187B2735E3B6E /* Rendering.swift */; };
@@ -33,6 +34,7 @@
 		473E77BF6EABCA8D3E8BB876 /* Particles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Particles.swift; sourceTree = "<group>"; };
 		4CB1FF5BC971F3BA82D0964A /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
 		69251C0337ED17168D061710 /* DiagramDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagramDetailView.swift; sourceTree = "<group>"; };
+		69F3B1B7ACA5D44D320F78FA /* Find.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Find.swift; sourceTree = "<group>"; };
 		6D6D3C782236A72509B0E8A4 /* Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		6E0B214308514FEA18A8F638 /* FeynmanDiagrams-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "FeynmanDiagrams-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		94EE5DF9A40AF037A2446442 /* ClaudeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeClient.swift; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 				E3188F6BE0BB73CF9DCBF7C0 /* DiagramModel.swift */,
 				29D5C7A032093C0E7B18A8D8 /* DiagramView.swift */,
 				2C8428C355656204FE424093 /* FeynmanRules.swift */,
+				69F3B1B7ACA5D44D320F78FA /* Find.swift */,
 				35CFD019A6A2FC91DBAB8B53 /* LearnViews.swift */,
 				4CB1FF5BC971F3BA82D0964A /* OrdersView.swift */,
 				213B503449EEEA7A014413C7 /* PageContext.swift */,
@@ -150,6 +153,7 @@
 				43926B9E5C85D59428AC9273 /* DiagramModel.swift in Sources */,
 				1341EAB591E317F6393D6313 /* DiagramView.swift in Sources */,
 				1BE9C7B24B5BBA921CE1C7A5 /* FeynmanRules.swift in Sources */,
+				219E0DB177385FCC0A4AD455 /* Find.swift in Sources */,
 				86B9AC479FC3B13A5A51587E /* LearnViews.swift in Sources */,
 				B726A847F1E619889C7DB1FE /* OrdersView.swift in Sources */,
 				5040C393E2AA1666B93716EE /* PageContext.swift in Sources */,
