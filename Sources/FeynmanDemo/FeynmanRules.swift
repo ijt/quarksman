@@ -100,18 +100,20 @@ struct SelectionInfoView: View {
             case .edge(let id):
                 let edge = diagram.edges[id]
                 let rule = FeynmanRules.rule(for: edge, in: diagram)
+                let isVirtual = diagram.isInternal(edge)
                 HStack {
-                    Text(edge.particle.symbol).font(.system(size: 28, weight: .bold, design: .serif))
+                    // Show the line's own label (e.g. e*, γ*) so it matches what was clicked.
+                    Text(edge.label).font(.system(size: 28, weight: .bold, design: .serif))
                         .foregroundStyle(edge.particle.style.color)
                     VStack(alignment: .leading) {
-                        Text(edge.particle.name).font(.headline)
+                        Text(isVirtual ? "Virtual \(edge.particle.name.lowercased())" : edge.particle.name).font(.headline)
                         Text(rule.title).font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 4) {
                     GridRow { Text("Charge").foregroundStyle(.secondary); Text(edge.particle.charge) }
                     GridRow { Text("Spin").foregroundStyle(.secondary); Text(edge.particle.spin) }
-                    GridRow { Text("Mass").foregroundStyle(.secondary); Text(edge.particle.mass) }
+                    GridRow { Text(isVirtual ? "Mass when real" : "Mass").foregroundStyle(.secondary); Text(edge.particle.mass) }
                 }
                 .font(.callout)
                 Text(edge.particle.blurb).font(.callout)
