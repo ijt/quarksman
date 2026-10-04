@@ -16,6 +16,8 @@ final class AskModel {
     private(set) var conversations: [String: [ChatTurn]] = [:]
     private(set) var isStreaming = false
     private var task: Task<Void, Never>?
+    /// Identifies the in-flight request, so a stopped one can't touch state owned by a newer one.
+    private var requestID: UUID?
 
     private static let system = """
     You are a friendly physics tutor inside a macOS app that teaches Feynman diagrams. \
@@ -39,7 +41,14 @@ final class AskModel {
     func stop() {
         task?.cancel()
         task = nil
+        requestID = nil
         isStreaming = false
+    }
+
+    /// Updates a reply by id; does nothing if it was cleared away in the meantime.
+    private func updateReply(_ id: UUID, on page: String, _ change: (inout ChatTurn) -> Void) {
+        guard let i = conversations[page]?.firstIndex(where: { $0.id == id }) else { return }
+        change(&conversations[page]![i])
     }
 
     func ask(_ question: String, context: PageContext) {
@@ -48,8 +57,8 @@ final class AskModel {
         let page = context.title
         let sent = "<page title=\"\(context.title)\">\n\(context.body)\n</page>\n\n\(question)"
         conversations[page, default: []].append(ChatTurn(role: "user", text: question, sent: sent))
-        conversations[page]!.append(ChatTurn(role: "assistant", text: "", sent: ""))
-        let replyIndex = conversations[page]!.count - 1
+        let reply = ChatTurn(role: "assistant", text: "", sent: "")
+        conversations[page]!.append(reply)
 
         // Turns alternate user/assistant. Earlier failed or empty exchanges aren't sent back to the API.
         let prior = Array(conversations[page]!.dropLast(2))
@@ -60,21 +69,29 @@ final class AskModel {
         }
         history.append(.init(role: "user", content: sent))
 
+        let request = UUID()
+        requestID = request
         isStreaming = true
         task = Task {
             do {
                 let client = try ClaudeClient.fromEnvironmentOrKeychain()
                 for try await chunk in client.stream(system: Self.system, messages: history) {
-                    conversations[page]?[replyIndex].text += chunk
+                    guard requestID == request else { break }
+                    updateReply(reply.id, on: page) { $0.text += chunk }
                 }
             } catch is CancellationError {
             } catch {
                 if !Task.isCancelled {
-                    conversations[page]?[replyIndex].text = error.localizedDescription
-                    conversations[page]?[replyIndex].isError = true
+                    updateReply(reply.id, on: page) {
+                        $0.text = error.localizedDescription
+                        $0.isError = true
+                    }
                 }
             }
-            isStreaming = false
+            if requestID == request {
+                requestID = nil
+                isStreaming = false
+            }
         }
     }
 }
