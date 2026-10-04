@@ -147,11 +147,11 @@ struct LinesView: View {
                 ])
                 HStack(spacing: 18) {
                     VStack {
-                        LineSample(style: .fermion, arrow: .forward).frame(width: 200, height: 50)
+                        LineSample(style: .fermion, arrow: .forward).frame(maxWidth: 200).frame(height: 50)
                         Text("electron e⁻ →").font(.caption)
                     }
                     VStack {
-                        LineSample(style: .fermion, arrow: .backward).frame(width: 200, height: 50)
+                        LineSample(style: .fermion, arrow: .backward).frame(maxWidth: 200).frame(height: 50)
                         Text("positron e⁺ →").font(.caption)
                     }
                 }
