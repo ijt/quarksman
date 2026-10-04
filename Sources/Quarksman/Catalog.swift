@@ -124,7 +124,7 @@ extension Diagram {
         edges: [
             Edge("a", "v1", .down),
             Edge("v1", "c", .up),
-            Edge("v1", "v2", .wMinus),
+            Edge("v1", "v2", .wMinus, label: "W*"),
             Edge("v2", "e", .electron),
             Edge("v2", "f", .antiNuE, labelSide: 1),
             Edge("s1", "s2", .down),
@@ -197,8 +197,8 @@ extension Diagram {
             Edge("b", "v4", .muon, labelSide: 1),
             Edge("v4", "d", .muon, labelSide: 1),
             Edge("v1", "v2", .photon, label: "γ*"),
-            Edge("v2", "v3", .electron, bend: 0.8, labelSide: 1, label: "e"),
-            Edge("v3", "v2", .electron, bend: 0.8, labelSide: 1, label: "e"),
+            Edge("v2", "v3", .electron, bend: 0.8, labelSide: 1, label: "e*"),
+            Edge("v3", "v2", .electron, bend: 0.8, labelSide: 1, label: "e*"),
             Edge("v3", "v4", .photon, label: "γ*"),
         ])
 
@@ -241,9 +241,9 @@ extension Diagram {
                 .ext("c", 0.96, 0.1), .ext("d", 0.96, 0.9)],
         edges: [
             Edge("a", "v1", .higgs),
-            Edge("v1", "v2", .top),
-            Edge("v2", "v3", .top),
-            Edge("v3", "v1", .top),
+            Edge("v1", "v2", .top, label: "t*"),
+            Edge("v2", "v3", .top, label: "t*"),
+            Edge("v3", "v1", .top, label: "t*"),
             Edge("v2", "c", .photon),
             Edge("v3", "d", .photon, labelSide: 1),
         ])

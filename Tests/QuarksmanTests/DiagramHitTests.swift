@@ -13,4 +13,13 @@ final class DiagramHitTests: XCTestCase {
             }
         }
     }
+
+    /// Virtual (internal) lines are starred, like e* or γ*; real (external) lines aren't.
+    func testVirtualLinesAreStarredAndRealOnesAreNot() {
+        for d in Diagram.catalog {
+            for e in d.edges {
+                XCTAssertEqual(e.label.hasSuffix("*"), d.isInternal(e), "\(d.title): line \(e.label) (\(e.from)→\(e.to))")
+            }
+        }
+    }
 }
