@@ -64,7 +64,7 @@ enum LineStyle: String, CaseIterable, Identifiable {
         case .gluon:
             return "Couples to color charge with strength g_s. Gluons carry color themselves, so there are three- and four-gluon vertices. This self-interaction leads to confinement."
         case .weak:
-            return "Massive (80–91 GeV), so their propagators are suppressed at low energies — that's why the weak force is weak. The W changes flavor: it turns d into u, or e⁻ into νₑ."
+            return "Very heavy: the W weighs 80 GeV and the Z 91 GeV, about 100 proton masses. The weak coupling is actually stronger than electromagnetism's, but at everyday energies the heavy mass suppresses the propagator, 1/(q² − M²) ≈ −1/M². That suppression is why the force seems weak. The W also changes flavor: it turns d into u, or e⁻ into νₑ."
         case .higgs:
             return "Couples to particles in proportion to their mass. A dashed line is the generic notation for any spin-0 (scalar) particle."
         }
