@@ -1,4 +1,4 @@
-<title>Feynman Diagrams</title>
+<title>Quarksman</title>
 <meta name="description" content="Interactive lessons on reading Feynman diagrams, with clickable Feynman rules and an Ask Claude panel.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -254,7 +254,7 @@ svg.diagram { display: block; width: 100%; height: auto; touch-action: pan-y; us
 
 <div class="app" id="app">
   <aside class="sidebar">
-    <div class="brand"><b>Feynman Diagrams</b><span>pictures that are equations</span></div>
+    <div class="brand"><b>Quarksman</b><span>Feynman diagrams you can play with</span></div>
     <nav class="nav" id="nav" aria-label="Lessons"></nav>
     <label class="eyebrow" for="nav-select" hidden>Page</label>
     <select class="nav-select" id="nav-select" aria-label="Choose a page"></select>
@@ -1205,7 +1205,7 @@ const Ask = (() => {
   const convos = new Map();
   let sample = null, ctl = null, busy = false, disabled = null, lastKey = "";
 
-  const RULES = `You are a friendly physics tutor inside an interactive web page that teaches Feynman diagrams. Each question arrives with a description of the page the student is looking at, inside <page> tags; it reflects what's on screen right now (selected lines, time slider, quiz state). Ground your answer in that page.
+  const RULES = `You are a friendly physics tutor inside Quarksman, an interactive app that teaches Feynman diagrams. Each question arrives with a description of the page the student is looking at, inside <page> tags; it reflects what's on screen right now (selected lines, time slider, quiz state). Ground your answer in that page.
 
 Pitch answers at a curious undergraduate unless the student asks for more or less depth. The answer appears in a narrow side panel, so keep it short: usually one to three brief paragraphs. Formatting: **bold**, *italics* and \`code\` render; headings, tables and LaTeX don't, so write math in plain Unicode (α, γ^μ, q², ∫d⁴k) and use simple "•" lines for lists. If the page says the student hasn't answered a quiz question yet, help them reason without giving away the answer.`;
 
