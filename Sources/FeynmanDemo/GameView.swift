@@ -649,7 +649,7 @@ struct ParticleZooView: View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
-                    ForEach(Species.allCases, id: \.self) { s in card(s) }
+                    ForEach(collectionOrder, id: \.self) { s in card(s) }
                 }
                 .padding(20)
             }
@@ -659,6 +659,11 @@ struct ParticleZooView: View {
         #if os(macOS)
         .frame(minWidth: 560, minHeight: 520)
         #endif
+    }
+
+    /// In the order particles unlock, so the collection fills in from the top.
+    private var collectionOrder: [Species] {
+        Species.allCases.sorted { (GameLevel.firstLevel(for: $0) ?? .max) < (GameLevel.firstLevel(for: $1) ?? .max) }
     }
 
     @ViewBuilder private func card(_ s: Species) -> some View {
@@ -679,7 +684,7 @@ struct ParticleZooView: View {
             }
         }
         .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: unlocked ? 170 : 110, alignment: .topLeading)
         .background(RoundedRectangle(cornerRadius: 12).fill(.background.secondary))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator))
     }
