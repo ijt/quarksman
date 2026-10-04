@@ -1,0 +1,360 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1341EAB591E317F6393D6313 /* DiagramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5C7A032093C0E7B18A8D8 /* DiagramView.swift */; };
+		1BE9C7B24B5BBA921CE1C7A5 /* FeynmanRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8428C355656204FE424093 /* FeynmanRules.swift */; };
+		29E62623C7FE65E4C669ED37 /* AskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB87762C971AC728BC722511 /* AskView.swift */; };
+		3E801B317D66C47207F7190E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33AD25B58ACE3B7ED7D2DD0E /* App.swift */; };
+		4267C77A57EF1031EDD67CCC /* Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFEE8D6AA11187B2735E3B6E /* Rendering.swift */; };
+		43926B9E5C85D59428AC9273 /* DiagramModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3188F6BE0BB73CF9DCBF7C0 /* DiagramModel.swift */; };
+		5040C393E2AA1666B93716EE /* PageContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213B503449EEEA7A014413C7 /* PageContext.swift */; };
+		534E3E0EE77FAC2A645FE499 /* ClaudeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94EE5DF9A40AF037A2446442 /* ClaudeClient.swift */; };
+		5F3989AAE9E29EA2CE8BCF3C /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A93125ADFEB1140C58BDE78 /* QuizView.swift */; };
+		86B9AC479FC3B13A5A51587E /* LearnViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CFD019A6A2FC91DBAB8B53 /* LearnViews.swift */; };
+		9EC574008C7F2A97FDF7B8D5 /* DiagramDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69251C0337ED17168D061710 /* DiagramDetailView.swift */; };
+		B726A847F1E619889C7DB1FE /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB1FF5BC971F3BA82D0964A /* OrdersView.swift */; };
+		B88209ECA79E5B50BFF26621 /* Adaptive.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30BC1B5AABCEDCA2DFF6F91 /* Adaptive.swift */; };
+		D33883ABA8B0C8C873C98DE3 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6D3C782236A72509B0E8A4 /* Catalog.swift */; };
+		FE3EBFAC3E97353E16D51C69 /* Particles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473E77BF6EABCA8D3E8BB876 /* Particles.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		213B503449EEEA7A014413C7 /* PageContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageContext.swift; sourceTree = "<group>"; };
+		29D5C7A032093C0E7B18A8D8 /* DiagramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagramView.swift; sourceTree = "<group>"; };
+		2C8428C355656204FE424093 /* FeynmanRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeynmanRules.swift; sourceTree = "<group>"; };
+		33AD25B58ACE3B7ED7D2DD0E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		35CFD019A6A2FC91DBAB8B53 /* LearnViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnViews.swift; sourceTree = "<group>"; };
+		473E77BF6EABCA8D3E8BB876 /* Particles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Particles.swift; sourceTree = "<group>"; };
+		4CB1FF5BC971F3BA82D0964A /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
+		69251C0337ED17168D061710 /* DiagramDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagramDetailView.swift; sourceTree = "<group>"; };
+		6D6D3C782236A72509B0E8A4 /* Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
+		6E0B214308514FEA18A8F638 /* FeynmanDiagrams-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "FeynmanDiagrams-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		94EE5DF9A40AF037A2446442 /* ClaudeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeClient.swift; sourceTree = "<group>"; };
+		9A93125ADFEB1140C58BDE78 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
+		CB87762C971AC728BC722511 /* AskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskView.swift; sourceTree = "<group>"; };
+		DFEE8D6AA11187B2735E3B6E /* Rendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering.swift; sourceTree = "<group>"; };
+		E30BC1B5AABCEDCA2DFF6F91 /* Adaptive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Adaptive.swift; sourceTree = "<group>"; };
+		E3188F6BE0BB73CF9DCBF7C0 /* DiagramModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagramModel.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		33295689FCF1B53833288E53 /* FeynmanDemo */ = {
+			isa = PBXGroup;
+			children = (
+				E30BC1B5AABCEDCA2DFF6F91 /* Adaptive.swift */,
+				33AD25B58ACE3B7ED7D2DD0E /* App.swift */,
+				CB87762C971AC728BC722511 /* AskView.swift */,
+				6D6D3C782236A72509B0E8A4 /* Catalog.swift */,
+				94EE5DF9A40AF037A2446442 /* ClaudeClient.swift */,
+				69251C0337ED17168D061710 /* DiagramDetailView.swift */,
+				E3188F6BE0BB73CF9DCBF7C0 /* DiagramModel.swift */,
+				29D5C7A032093C0E7B18A8D8 /* DiagramView.swift */,
+				2C8428C355656204FE424093 /* FeynmanRules.swift */,
+				35CFD019A6A2FC91DBAB8B53 /* LearnViews.swift */,
+				4CB1FF5BC971F3BA82D0964A /* OrdersView.swift */,
+				213B503449EEEA7A014413C7 /* PageContext.swift */,
+				473E77BF6EABCA8D3E8BB876 /* Particles.swift */,
+				9A93125ADFEB1140C58BDE78 /* QuizView.swift */,
+				DFEE8D6AA11187B2735E3B6E /* Rendering.swift */,
+			);
+			name = FeynmanDemo;
+			path = Sources/FeynmanDemo;
+			sourceTree = "<group>";
+		};
+		574ACDDCD26036176B91A2EE = {
+			isa = PBXGroup;
+			children = (
+				33295689FCF1B53833288E53 /* FeynmanDemo */,
+				97782C5F8A7E9EB50892CD3B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		97782C5F8A7E9EB50892CD3B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6E0B214308514FEA18A8F638 /* FeynmanDiagrams-iOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C2C3CBC90909A7639AB1E5A3 /* FeynmanDiagrams-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D46BCE4FA5238AAB2989A8F9 /* Build configuration list for PBXNativeTarget "FeynmanDiagrams-iOS" */;
+			buildPhases = (
+				E2EA673848B7ACED4098BEB6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "FeynmanDiagrams-iOS";
+			packageProductDependencies = (
+			);
+			productName = "FeynmanDiagrams-iOS";
+			productReference = 6E0B214308514FEA18A8F638 /* FeynmanDiagrams-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A8D47CA35FB67FC98130E5FB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					C2C3CBC90909A7639AB1E5A3 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 1534C90C315E790130AE09AA /* Build configuration list for PBXProject "FeynmanDemo" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 574ACDDCD26036176B91A2EE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 97782C5F8A7E9EB50892CD3B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C2C3CBC90909A7639AB1E5A3 /* FeynmanDiagrams-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E2EA673848B7ACED4098BEB6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B88209ECA79E5B50BFF26621 /* Adaptive.swift in Sources */,
+				3E801B317D66C47207F7190E /* App.swift in Sources */,
+				29E62623C7FE65E4C669ED37 /* AskView.swift in Sources */,
+				D33883ABA8B0C8C873C98DE3 /* Catalog.swift in Sources */,
+				534E3E0EE77FAC2A645FE499 /* ClaudeClient.swift in Sources */,
+				9EC574008C7F2A97FDF7B8D5 /* DiagramDetailView.swift in Sources */,
+				43926B9E5C85D59428AC9273 /* DiagramModel.swift in Sources */,
+				1341EAB591E317F6393D6313 /* DiagramView.swift in Sources */,
+				1BE9C7B24B5BBA921CE1C7A5 /* FeynmanRules.swift in Sources */,
+				86B9AC479FC3B13A5A51587E /* LearnViews.swift in Sources */,
+				B726A847F1E619889C7DB1FE /* OrdersView.swift in Sources */,
+				5040C393E2AA1666B93716EE /* PageContext.swift in Sources */,
+				FE3EBFAC3E97353E16D51C69 /* Particles.swift in Sources */,
+				5F3989AAE9E29EA2CE8BCF3C /* QuizView.swift in Sources */,
+				4267C77A57EF1031EDD67CCC /* Rendering.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2CF285F8D0AE5D42D3A3BF8E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Feynman;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.issactrotts.FeynmanDiagrams;
+				PRODUCT_NAME = FeynmanDiagrams;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4C0FAE6075C59087EF7DF842 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		690394023C2DB7C1877144D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Feynman;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.issactrotts.FeynmanDiagrams;
+				PRODUCT_NAME = FeynmanDiagrams;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A5B15DD5A868AA5347F42388 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1534C90C315E790130AE09AA /* Build configuration list for PBXProject "FeynmanDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C0FAE6075C59087EF7DF842 /* Debug */,
+				A5B15DD5A868AA5347F42388 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D46BCE4FA5238AAB2989A8F9 /* Build configuration list for PBXNativeTarget "FeynmanDiagrams-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				690394023C2DB7C1877144D9 /* Debug */,
+				2CF285F8D0AE5D42D3A3BF8E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A8D47CA35FB67FC98130E5FB /* Project object */;
+}
