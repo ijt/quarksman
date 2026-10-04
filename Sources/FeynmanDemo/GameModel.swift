@@ -77,6 +77,41 @@ enum Species: String, CaseIterable, Codable {
     }
 }
 
+extension Species {
+    /// Charge as shown in the Particle Zoo (the particle, not its antiparticle).
+    var chargeLabel: String { self == .w ? "±1" : chargeText(charge) }
+
+    var mass: String {
+        switch self {
+        case .e: return "0.511 MeV"
+        case .mu: return "105.7 MeV"
+        case .nuE, .nuMu: return "under 1 eV"
+        case .u: return "≈2.2 MeV"
+        case .d: return "≈4.7 MeV"
+        case .t: return "≈172.6 GeV"
+        case .photon, .gluon: return "0"
+        case .w: return "80.4 GeV"
+        case .higgs: return "125.1 GeV"
+        }
+    }
+
+    var fact: String {
+        switch self {
+        case .e: return "The lightest charged particle, and stable. All of chemistry is electrons rearranging."
+        case .mu: return "A 207× heavier electron. Muons from cosmic rays rain through you all day, living just long enough to reach the ground."
+        case .nuE: return "Feels only the weak force. Trillions from the Sun pass through your body every second."
+        case .nuMu: return "The muon's partner. A different neutrino from the electron's, as its 1962 discovery showed."
+        case .u: return "The lightest quark, with charge +⅔. A proton is two ups and a down."
+        case .d: return "Charge −⅓. Slightly heavier than the up, which is why free neutrons decay."
+        case .t: return "The heaviest known elementary particle, about as heavy as a gold atom. It decays before it can form hadrons."
+        case .photon: return "Carries the electromagnetic force. Massless and neutral, so photons don't interact with each other."
+        case .gluon: return "Carries the strong force and has color charge of its own, so gluons stick to each other."
+        case .w: return "Carries the weak force and changes flavor. Its large mass is why the weak force seems weak."
+        case .higgs: return "The excitation of the field that gives particles mass. Found at the LHC in 2012."
+        }
+    }
+}
+
 func chargeText(_ q: Double) -> String {
     let thirds = Int((q * 3).rounded())
     switch thirds {
@@ -116,6 +151,18 @@ struct GameLevel: Identifiable {
     let hint: String
     let lesson: String
     var impossible: Bool { par == nil }
+
+    /// Every particle in the level, external or available for internal lines.
+    var species: Set<Species> { Set(palette + legs.map(\.species)) }
+
+    /// Particles that appear for the first time in level `index`, in a stable order.
+    static func introduced(at index: Int) -> [Species] {
+        let earlier = all[..<index].reduce(into: Set<Species>()) { $0.formUnion($1.species) }
+        return Species.allCases.filter { all[index].species.contains($0) && !earlier.contains($0) }
+    }
+
+    /// The first level that uses a particle.
+    static func firstLevel(for s: Species) -> Int? { all.firstIndex { $0.species.contains(s) } }
 
     var processText: String {
         let ins = legs.filter(\.incoming).map(\.symbol).joined(separator: " ")

@@ -17,20 +17,53 @@ final class GameModel {
     private(set) var wrongImpossibleGuess = false
     private(set) var notice: String?
     private(set) var stars: [String: Int]
+    /// Particles whose introduction card has been dismissed.
+    private(set) var seen: Set<Species>
+    /// When the success animation started; nil when it isn't playing.
+    private(set) var celebration: Date?
 
     private static let starsKey = "gameStars"
+    private static let seenKey = "gameSeenSpecies"
+    static let celebrationSeconds: Double = 2.6
 
     var level: GameLevel { GameLevel.all[levelIndex] }
     var solved: Bool { check?.isValid == true }
     var canUndo: Bool { !history.isEmpty }
 
     init() {
-        board = Board(level: GameLevel.all[0])
-        stars = (UserDefaults.standard.dictionary(forKey: Self.starsKey) as? [String: Int]) ?? [:]
-        internalSpecies = GameLevel.all[0].palette[0]
+        let stars = (UserDefaults.standard.dictionary(forKey: Self.starsKey) as? [String: Int]) ?? [:]
+        self.stars = stars
+        seen = Set((UserDefaults.standard.stringArray(forKey: Self.seenKey) ?? []).compactMap(Species.init(rawValue:)))
+        // Pick up at the first unsolved level.
+        let resume = GameLevel.all.firstIndex { stars[$0.id] == nil } ?? GameLevel.all.count - 1
+        levelIndex = resume
+        board = Board(level: GameLevel.all[resume])
+        internalSpecies = GameLevel.all[resume].palette[0]
     }
 
+    /// Levels unlock in order: each needs the one before it solved.
+    func isUnlocked(_ index: Int) -> Bool {
+        index == 0 || (stars[GameLevel.all[index - 1].id] ?? 0) > 0
+    }
+
+    /// Particles from every unlocked level, shown in the Particle Zoo.
+    var unlockedSpecies: Set<Species> {
+        GameLevel.all.indices.filter(isUnlocked).reduce(into: Set<Species>()) { $0.formUnion(GameLevel.all[$1].species) }
+    }
+
+    /// New particles in this level that haven't been introduced yet.
+    var newSpecies: [Species] { GameLevel.introduced(at: levelIndex).filter { !seen.contains($0) } }
+
+    func acknowledgeNewSpecies() {
+        seen.formUnion(newSpecies)
+        UserDefaults.standard.set(seen.map(\.rawValue), forKey: Self.seenKey)
+    }
+
+    func endCelebration() { celebration = nil }
+
     func go(to index: Int) {
+        guard isUnlocked(index) else { return }
+        celebration = nil
         levelIndex = min(max(index, 0), GameLevel.all.count - 1)
         board = Board(level: level)
         history = []
@@ -51,6 +84,7 @@ final class GameModel {
         history.append(board)
         board = next
         check = nil
+        celebration = nil
         notice = nil
         wrongImpossibleGuess = false
     }
@@ -109,7 +143,7 @@ final class GameModel {
         selection = nil
     }
 
-    func runCheck() {
+    func runCheck(animate: Bool = true) {
         let result = GameRules.check(board, level: level)
         notice = nil
         wrongImpossibleGuess = false
@@ -119,6 +153,7 @@ final class GameModel {
             return
         }
         check = result
+        if result.isValid && animate { celebration = .now }
         let earned = GameRules.stars(for: result, level: level)
         if earned > (stars[level.id] ?? 0) { record(earned) }
     }
@@ -174,11 +209,14 @@ final class GameModel {
 
 struct GameView: View {
     @State private var game = GameModel()
+    @State private var showZoo = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         FindableScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
+                if !game.newSpecies.isEmpty { NewParticlesCard(game: game) }
                 DiagramCard {
                     GameBoardView(game: game).adaptiveHeight(400, compact: 300)
                 }
@@ -191,6 +229,12 @@ struct GameView: View {
             .frame(maxWidth: 900, alignment: .leading)
         }
         .navigationTitle("Diagram Builder Game")
+        .sheet(isPresented: $showZoo) { ParticleZooView(game: game, isPresented: $showZoo) }
+        .task(id: game.celebration) {
+            guard game.celebration != nil else { return }
+            try? await Task.sleep(for: .seconds(GameModel.celebrationSeconds))
+            if !Task.isCancelled { game.endCelebration() }
+        }
         .pageContext(PageContext(
             title: "Diagram Builder Game",
             body: game.contextText,
@@ -204,9 +248,18 @@ struct GameView: View {
             HStack {
                 Text("Level \(game.levelIndex + 1) of \(GameLevel.all.count)").font(.caption.bold()).foregroundStyle(.secondary)
                 Spacer()
+                Button { showZoo = true } label: {
+                    Label("Particle Zoo \(game.unlockedSpecies.count)/\(Species.allCases.count)", systemImage: "square.grid.3x3")
+                }
+                .buttonStyle(.bordered)
+                .fixedSize()
                 Menu {
                     ForEach(Array(GameLevel.all.enumerated()), id: \.element.id) { i, level in
-                        Button("\(i + 1). \(level.title)  \(String(repeating: "★", count: game.stars[level.id] ?? 0))") { game.go(to: i) }
+                        if game.isUnlocked(i) {
+                            Button("\(i + 1). \(level.title)  \(String(repeating: "★", count: game.stars[level.id] ?? 0))") { game.go(to: i) }
+                        } else {
+                            Button("\(i + 1). Locked", systemImage: "lock") {}.disabled(true)
+                        }
                     }
                 } label: {
                     Label("Levels", systemImage: "list.number")
@@ -253,7 +306,7 @@ struct GameView: View {
     private var controls: some View {
         AdaptiveStack(spacing: 8) {
             HStack(spacing: 8) {
-                Button("Check") { game.runCheck() }
+                Button("Check") { game.runCheck(animate: !reduceMotion) }
                     .buttonStyle(.borderedProminent)
                 Button("It can't happen") { game.claimImpossible() }
                     .buttonStyle(.bordered)
@@ -350,7 +403,14 @@ struct GameBoardView: View {
     var body: some View {
         GeometryReader { geo in
             let frame = Self.frame(in: geo.size, aspect: aspect)
-            Canvas { ctx, _ in draw(&ctx, frame: frame) }
+            TimelineView(.animation(paused: game.celebration == nil)) { timeline in
+                Canvas { ctx, _ in
+                    draw(&ctx, frame: frame)
+                    if let start = game.celebration {
+                        drawCelebration(&ctx, frame: frame, progress: timeline.date.timeIntervalSince(start) / GameModel.celebrationSeconds)
+                    }
+                }
+            }
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
@@ -431,6 +491,50 @@ struct GameBoardView: View {
         }
     }
 
+    /// A "now" line sweeps left to right; a glowing particle rides each line where it crosses, and vertices flash.
+    private func drawCelebration(_ ctx: inout GraphicsContext, frame: CGRect, progress: Double) {
+        guard progress >= 0, progress <= 1 else { return }
+        let ease = progress < 0.5 ? 2 * progress * progress : 1 - pow(-2 * progress + 2, 2) / 2
+        let x = frame.minX + frame.width * (0.02 + 0.96 * CGFloat(ease))
+
+        var now = Path()
+        now.move(to: CGPoint(x: x, y: frame.minY - 10))
+        now.addLine(to: CGPoint(x: x, y: frame.maxY + 6))
+        ctx.stroke(now, with: .color(.accentColor.opacity(0.5)), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+
+        for e in game.board.edges {
+            guard let g = geometry(e, frame: frame), let p = Self.crossing(g, x: x) else { continue }
+            let isVirtual = game.board.node(e.a)?.isVertex == true
+            let pulse = isVirtual ? 1 + 0.35 * sin(progress * 40) : 1
+            // Matter lines are drawn in the text color, so give their particles a warm glow to stand out.
+            let color = e.species.isFermion ? Color.yellow : e.species.style.color
+            let r = 14 * pulse
+            ctx.fill(Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: 2 * r, height: 2 * r)), with: .color(color.opacity(0.3)))
+            ctx.fill(Path(ellipseIn: CGRect(x: p.x - 6.5, y: p.y - 6.5, width: 13, height: 13)), with: .color(color))
+            ctx.fill(Path(ellipseIn: CGRect(x: p.x - 2.5, y: p.y - 2.5, width: 5, height: 5)), with: .color(.white))
+        }
+
+        for v in game.board.vertices {
+            let p = point(v, frame: frame)
+            let d = abs(p.x - x)
+            guard d < 40 else { continue }
+            let r = 8 + (40 - d) * 0.5
+            ctx.stroke(Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: 2 * r, height: 2 * r)),
+                       with: .color(.yellow.opacity(Double(1 - d / 40))), lineWidth: 3)
+        }
+    }
+
+    /// Where a line crosses the vertical line at `x`, if it does.
+    static func crossing(_ g: EdgeGeometry, x: CGFloat) -> CGPoint? {
+        for i in 1..<g.samples.count {
+            let a = g.samples[i - 1], b = g.samples[i]
+            guard (a.x - x) * (b.x - x) <= 0, a.x != b.x else { continue }
+            let t = (x - a.x) / (b.x - a.x)
+            return CGPoint(x: x, y: a.y + (b.y - a.y) * t)
+        }
+        return nil
+    }
+
     private func draw(_ ctx: inout GraphicsContext, frame: CGRect) {
         let board = game.board, level = game.level
         let problemNodes = Set(game.check?.problems.flatMap(\.nodes) ?? [])
@@ -505,5 +609,78 @@ struct GameBoardView: View {
                 ctx.fill(Path(ellipseIn: CGRect(x: p.x - 5, y: p.y - 5, width: 10, height: 10)), with: .color(.primary))
             }
         }
+    }
+}
+
+/// Introduces particles the first time a level uses them.
+struct NewParticlesCard: View {
+    let game: GameModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(game.levelIndex == 0 ? "Your first particles" : "New particle\(game.newSpecies.count == 1 ? "" : "s") unlocked!",
+                  systemImage: "sparkles")
+                .font(.headline).foregroundStyle(.yellow)
+            ForEach(game.newSpecies, id: \.self) { s in
+                HStack(alignment: .top, spacing: 12) {
+                    LineSample(style: s.style).frame(width: 70, height: 26)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(s.symbol()) · \(s.name.capitalized)").font(.headline)
+                        Text(s.fact).font(.callout).foregroundStyle(.secondary)
+                    }
+                }
+            }
+            Button("Got it") { withAnimation { game.acknowledgeNewSpecies() } }
+                .buttonStyle(.borderedProminent)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 14).fill(Color.yellow.opacity(0.12)))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.yellow.opacity(0.4)))
+    }
+}
+
+/// Every particle in the game: unlocked ones with their facts, locked ones as mystery cards.
+struct ParticleZooView: View {
+    let game: GameModel
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
+                    ForEach(Species.allCases, id: \.self) { s in card(s) }
+                }
+                .padding(20)
+            }
+            .navigationTitle("Particle Zoo")
+            .toolbar { Button("Done") { isPresented = false } }
+        }
+        #if os(macOS)
+        .frame(minWidth: 560, minHeight: 520)
+        #endif
+    }
+
+    @ViewBuilder private func card(_ s: Species) -> some View {
+        let unlocked = game.unlockedSpecies.contains(s)
+        VStack(alignment: .leading, spacing: 8) {
+            if unlocked {
+                LineSample(style: s.style).frame(height: 30)
+                Text("\(s.symbol()) · \(s.name.capitalized)").font(.headline)
+                Text("Charge \(s.chargeLabel) · Mass \(s.mass)").font(.caption).foregroundStyle(.secondary)
+                Text(s.fact).font(.callout)
+            } else {
+                Image(systemName: "questionmark").font(.title).foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity, minHeight: 30)
+                Text("Locked").font(.headline).foregroundStyle(.secondary)
+                if let i = GameLevel.firstLevel(for: s) {
+                    Text("Unlocks at level \(i + 1)").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
+        .background(RoundedRectangle(cornerRadius: 12).fill(.background.secondary))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator))
     }
 }
