@@ -42,7 +42,7 @@ struct IntroView: View {
             VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Feynman Diagrams").font(.system(size: 40, weight: .bold, design: .serif))
-                    Text("Pictures that are also equations.").font(.title2).foregroundStyle(.secondary)
+                    Text("Pictures that are also equations").font(.title2).foregroundStyle(.secondary)
                 }
                 .textSelection(.enabled)
 
