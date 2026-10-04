@@ -26,6 +26,15 @@ enum LineStyle: String, CaseIterable, Identifiable {
         }
     }
 
+    /// Particle family and spin, e.g. "Boson · spin 1".
+    var family: String {
+        switch self {
+        case .fermion: return "Fermion · spin ½"
+        case .photon, .gluon, .weak: return "Boson · spin 1"
+        case .higgs: return "Boson · spin 0"
+        }
+    }
+
     var drawing: String {
         switch self {
         case .fermion: return "Solid line with an arrow"

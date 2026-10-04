@@ -110,7 +110,14 @@ struct LinesView: View {
                             .background(RoundedRectangle(cornerRadius: 10).fill(.background.secondary))
                             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.separator))
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(style.title).font(.headline).foregroundStyle(style.color == .primary ? Color.primary : style.color)
+                            HStack(spacing: 8) {
+                                Text(style.title).font(.headline).foregroundStyle(style.color == .primary ? Color.primary : style.color)
+                                Text(style.family)
+                                    .font(.caption.weight(.semibold))
+                                    .padding(.horizontal, 7).padding(.vertical, 2)
+                                    .background(Capsule().fill(style.color.opacity(0.15)))
+                                    .foregroundStyle(style.color == .primary ? Color.secondary : style.color)
+                            }
                             Text(style.drawing).font(.subheadline.italic()).foregroundStyle(.secondary)
                             Text(style.examples).font(.callout)
                             Text(LocalizedStringKey(style.summary)).font(.callout).foregroundStyle(.secondary)
@@ -142,7 +149,7 @@ struct LinesView: View {
         .pageContext(PageContext(
             title: "The cast of lines",
             body: "Page listing line styles:\n" + LineStyle.allCases.map {
-                "• \($0.title): \($0.drawing). \($0.examples). \($0.summary)"
+                "• \($0.title) (\($0.family)): \($0.drawing). \($0.examples). \($0.summary)"
             }.joined(separator: "\n") + "\nAlso explains that a positron is an electron line with its arrow pointing backward in time.",
             suggestions: ["Why does the fermion arrow point backward for antiparticles?",
                           "Why can gluons interact with each other but photons can't?",
