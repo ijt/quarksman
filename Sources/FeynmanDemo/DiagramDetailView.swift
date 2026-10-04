@@ -39,6 +39,10 @@ struct DiagramDetailView: View {
             .padding(24)
         }
         .navigationTitle(diagram.title)
+        .pageContext(PageContext(
+            title: diagram.title,
+            body: diagram.contextText(selection: selection, time: showSlice ? time : nil),
+            suggestions: suggestions))
         .task(id: playing) {
             guard playing else { return }
             while !Task.isCancelled {
@@ -52,6 +56,17 @@ struct DiagramDetailView: View {
             time = 0.02
             playing = false
         }
+    }
+
+    private var suggestions: [String] {
+        var s = ["Walk me through this diagram step by step.",
+                 "Which particles here are virtual, and what does that mean?"]
+        switch selection {
+        case .edge(let id): s.insert("Explain the Feynman rule for the \(diagram.edges[id].label) line I selected.", at: 0)
+        case .vertex: s.insert("What's conserved at the vertex I selected?", at: 0)
+        case .none: s.append("How would I compute a cross-section from this?")
+        }
+        return s
     }
 
     private var header: some View {

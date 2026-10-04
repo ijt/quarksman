@@ -102,6 +102,18 @@ struct QuizView: View {
             .padding(28)
         }
         .navigationTitle("Quiz")
+        .pageContext(PageContext(
+            title: "Quiz",
+            body: """
+            Quiz page. Current question: "\(question.prompt)" about this diagram:
+            \(question.diagram.contextText(selection: nil, time: nil))
+            Options: \(question.options.joined(separator: " | ")).
+            """ + (chosen == nil
+                ? "\nThe student hasn't answered yet. Give hints, but don't reveal the answer or which option is correct."
+                : "\nThe student answered \"\(chosen!)\"; the correct answer is \"\(question.answer)\". \(question.explanation)"),
+            suggestions: chosen == nil
+                ? ["Can you give me a hint?", "How do I count loops?"]
+                : ["Why is that the answer?", "Give me a harder question like this one."]))
     }
 
     private func choose(_ option: String) {

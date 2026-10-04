@@ -66,6 +66,18 @@ struct IntroView: View {
             .padding(28)
         }
         .navigationTitle("Introduction")
+        .pageContext(PageContext(
+            title: "What is a Feynman diagram?",
+            body: """
+            Intro page. Explains that Feynman diagrams are pictures that stand for terms in a perturbative \
+            calculation of a scattering amplitude; lines are particles, vertices are interactions, external \
+            lines are real and internal lines virtual; time runs left to right; each vertex brings a power of \
+            the coupling (α ≈ 1/137 in QED). Shows e⁻e⁺ → μ⁻μ⁺ with a time slider. \
+            Current time slider: \(Int(time * 100))%. \(stateDescription)
+            """,
+            suggestions: ["Are virtual particles real?",
+                          "Why do we add amplitudes before squaring?",
+                          "Why does time run left to right here but upward in some books?"]))
     }
 
     private var stateDescription: String {
@@ -124,6 +136,14 @@ struct LinesView: View {
             .padding(28)
         }
         .navigationTitle("The cast of lines")
+        .pageContext(PageContext(
+            title: "The cast of lines",
+            body: "Page listing line styles:\n" + LineStyle.allCases.map {
+                "• \($0.title): \($0.drawing). \($0.examples). \($0.summary)"
+            }.joined(separator: "\n") + "\nAlso explains that a positron is an electron line with its arrow pointing backward in time.",
+            suggestions: ["Why does the fermion arrow point backward for antiparticles?",
+                          "Why can gluons interact with each other but photons can't?",
+                          "Why are the W and Z so heavy?"]))
     }
 }
 
@@ -278,5 +298,17 @@ struct VertexExplorerView: View {
             .padding(28)
         }
         .navigationTitle("One vertex, six stories")
+        .pageContext(PageContext(
+            title: "One vertex, six stories",
+            body: """
+            Interactive page: the single QED vertex (two fermion legs, one photon leg) rotated by a slider, \
+            read with time left to right. Legs on the left are incoming, on the right outgoing. \
+            Currently rotated to \(Int(angle))°, which reads as "\(story?.title ?? "?")": \
+            \(reading.initial.joined(separator: " + ")) → \(reading.final.joined(separator: " + ")). \
+            The page notes none of the six readings can happen alone with all particles real, and mentions crossing symmetry.
+            """,
+            suggestions: ["Why can't a free electron emit a real photon?",
+                          "What is crossing symmetry?",
+                          "How is this vertex used inside bigger diagrams?"]))
     }
 }

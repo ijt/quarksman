@@ -71,6 +71,17 @@ struct OrdersView: View {
             .padding(28)
         }
         .navigationTitle("Orders & loops")
+        .pageContext(PageContext(
+            title: "Orders & loops",
+            body: """
+            Page on perturbation theory: amplitude = tree + 1-loop + 2-loop + …, each loop suppressed by ~α/π. \
+            Shows Møller scattering (tree) and vacuum polarization (1 loop), a coupling slider with bars for \
+            (α/π)^L, and the count of QED diagrams for electron g−2 by loop order (1, 7, 72, 891, 12,672). \
+            The slider is currently at α = \(String(format: "%.4f", alpha)), so α/π = \(String(format: "%.4f", alpha / .pi)).
+            """,
+            suggestions: ["Why is each loop suppressed by about α/π?",
+                          "What is lattice QCD and why is it needed?",
+                          "Does the perturbation series actually converge?"]))
     }
 
     private func miniDiagram(_ d: Diagram, caption: String) -> some View {
