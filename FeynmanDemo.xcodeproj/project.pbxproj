@@ -23,6 +23,7 @@
 		9EC574008C7F2A97FDF7B8D5 /* DiagramDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69251C0337ED17168D061710 /* DiagramDetailView.swift */; };
 		B726A847F1E619889C7DB1FE /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB1FF5BC971F3BA82D0964A /* OrdersView.swift */; };
 		B88209ECA79E5B50BFF26621 /* Adaptive.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30BC1B5AABCEDCA2DFF6F91 /* Adaptive.swift */; };
+		BF07D67855FD62B42B326397 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 811B7D7C22F40F637FBAE342 /* Assets.xcassets */; };
 		D33883ABA8B0C8C873C98DE3 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6D3C782236A72509B0E8A4 /* Catalog.swift */; };
 		E9FC1C706DE4268E9A64CB51 /* MassShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464C74B19D3CDB80F7C7EF0A /* MassShell.swift */; };
 		FE3EBFAC3E97353E16D51C69 /* Particles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473E77BF6EABCA8D3E8BB876 /* Particles.swift */; };
@@ -41,6 +42,7 @@
 		69F3B1B7ACA5D44D320F78FA /* Find.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Find.swift; sourceTree = "<group>"; };
 		6D6D3C782236A72509B0E8A4 /* Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		6E0B214308514FEA18A8F638 /* FeynmanDiagrams-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "FeynmanDiagrams-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		811B7D7C22F40F637FBAE342 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		94EE5DF9A40AF037A2446442 /* ClaudeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeClient.swift; sourceTree = "<group>"; };
 		9A93125ADFEB1140C58BDE78 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
 		AF59161A0FEAC9E0BE36CFAF /* GameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				33295689FCF1B53833288E53 /* FeynmanDemo */,
+				ABCFF17407AD8E48E2508937 /* iOS */,
 				97782C5F8A7E9EB50892CD3B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -95,6 +98,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		ABCFF17407AD8E48E2508937 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				811B7D7C22F40F637FBAE342 /* Assets.xcassets */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -103,6 +114,7 @@
 			buildConfigurationList = D46BCE4FA5238AAB2989A8F9 /* Build configuration list for PBXNativeTarget "FeynmanDiagrams-iOS" */;
 			buildPhases = (
 				E2EA673848B7ACED4098BEB6 /* Sources */,
+				697ACFD44309634E0EB7E569 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -147,6 +159,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		697ACFD44309634E0EB7E569 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF07D67855FD62B42B326397 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E2EA673848B7ACED4098BEB6 /* Sources */ = {

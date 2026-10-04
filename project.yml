@@ -11,6 +11,9 @@ targets:
     platform: iOS
     sources:
       - path: Sources/FeynmanDemo
+        excludes:
+          - Resources   # macOS-only (SwiftPM) icon
+      - path: iOS/Assets.xcassets
     settings:
       base:
         PRODUCT_NAME: FeynmanDiagrams
@@ -26,3 +29,4 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         CODE_SIGN_STYLE: Automatic
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

@@ -5,7 +5,7 @@ let package = Package(
     name: "FeynmanDemo",
     platforms: [.macOS(.v14), .iOS(.v17)],
     targets: [
-        .executableTarget(name: "FeynmanDemo", path: "Sources/FeynmanDemo"),
+        .executableTarget(name: "FeynmanDemo", path: "Sources/FeynmanDemo", resources: [.copy("Resources/AppIcon.png")]),
         .testTarget(name: "FeynmanDemoTests", dependencies: ["FeynmanDemo"], path: "Tests/FeynmanDemoTests"),
     ]
 )
