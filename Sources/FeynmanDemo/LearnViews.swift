@@ -30,7 +30,7 @@ struct IntroView: View {
     @State private var time: CGFloat = 0.1
 
     private let nextSteps: [(page: Page, title: String, detail: String)] = [
-        (.lines, "The cast of lines", "The visual vocabulary."),
+        (.lines, "The cast of lines", "The visual vocabulary"),
         (.vertex, "One vertex, six stories", "Rotate a single vertex to see emission, absorption, pair creation and annihilation."),
         (.diagram(Diagram.catalog[0].id), "Processes", "Ten real processes. Click lines to inspect them and sweep the time slice."),
         (.orders, "Orders & loops", "Why perturbation theory works for QED but not for low-energy QCD."),
