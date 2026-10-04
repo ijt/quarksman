@@ -35,7 +35,7 @@ enum FeynmanRules {
             case .higgs: formula = "i / (q² − m²_H)"
             }
             return Rule(title: "Propagator (virtual \(p.name.lowercased()))", formula: formula,
-                        explanation: "Internal lines are **virtual**. They're off-shell, meaning q² ≠ m², and are never observed directly. The propagator is largest when q² is close to m². That's how resonances appear.")
+                        explanation: "Internal lines are **virtual**. They can be off-shell, meaning off the mass shell q² = m² that real particles satisfy, and are never observed directly. The propagator is largest when q² is close to m². That's how resonances appear.")
         case .incoming, .outgoing:
             let incoming = role(of: e, in: d) == .incoming
             let formula: String
@@ -53,7 +53,7 @@ enum FeynmanRules {
             }
             return Rule(title: "External \(incoming ? "incoming" : "outgoing") \(p.name.lowercased())",
                         formula: formula,
-                        explanation: "External lines are **real** particles: on-shell (p² = m²) and seen in the detector. Each one contributes a wavefunction factor: a spinor for fermions, a polarization vector for vector bosons.")
+                        explanation: "External lines are **real** particles: on-shell, meaning their four-momentum satisfies p² = E² − |p⃗|² = m², and seen in the detector. Each one contributes a wavefunction factor: a spinor for fermions, a polarization vector for vector bosons.")
         }
     }
 

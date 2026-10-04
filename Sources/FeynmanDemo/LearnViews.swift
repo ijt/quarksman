@@ -67,7 +67,8 @@ struct IntroView: View {
                     "**Time runs left to right** in this app. Some books draw time running upward. The physics is the same.",
                     "**Lines are particles.** Straight lines with arrows are matter (fermions). Wavy, curly and dashed lines are force carriers (bosons).",
                     "**Vertices are interactions.** At each dot, particles are absorbed or emitted. Charge, energy and momentum are conserved at every vertex.",
-                    "**External lines** stick out of the diagram. They're the real particles you send in and detect. **Internal lines** run between two vertices. They're *virtual* particles that are never observed and don't obey E² = p² + m².",
+                    "**External lines** stick out of the diagram. They're the real particles you send in and detect. **Internal lines** run between two vertices. They're *virtual* particles that are never observed.",
+                    "**On-shell and off-shell.** A real particle's energy and momentum always satisfy E² = p² + m² (in units where c = 1). Plotted in energy–momentum space, the allowed points form a curved surface called the **mass shell**. Real particles are **on-shell**. Virtual particles can be **off-shell**: energy and momentum are still conserved at every vertex, but the particle doesn't have the \"right\" mass for its momentum. Diagrams often write this using q² = E² − p², so on-shell means q² = m².",
                 ])
 
                 Section_("The key idea: perturbation theory", [

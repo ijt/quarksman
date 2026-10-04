@@ -16,7 +16,7 @@ extension Diagram {
         summary: "An electron and positron annihilate into a virtual photon, which then turns into a muon–antimuon pair.",
         details: [
             "Read it left to right. At the first vertex the electron and positron disappear and a **virtual photon** appears. At the second vertex the photon turns into a muon and an antimuon.",
-            "This is an **s-channel** diagram: the virtual photon carries the whole collision energy, so q² = s = E²ᶜᵐ. A real photon always has q² = 0, so this photon is **off-shell**. That's allowed only because it is never observed.",
+            "This is an **s-channel** diagram: the virtual photon carries the whole collision energy, so q² = s = E²ᶜᵐ. A real photon always has q² = 0 (it's massless), so this photon is **off-shell**: it isn't on the mass shell q² = m² that real particles satisfy. That's allowed only because it is never observed.",
             "There are two vertices, so the amplitude goes as e² and the cross-section as α². Working through the Feynman rules gives the textbook result σ = 4πα²/3s.",
         ],
         amplitude: "𝓜 = [v̄(p₂)(−ieγ^μ)u(p₁)] · (−ig_μν / q²) · [ū(p₃)(−ieγ^ν)v(p₄)]",
