@@ -13,9 +13,9 @@ struct Section_: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if !title.isEmpty {
-                Text(title).font(.title2.bold()).hiddenOnIOS(isPageTitle)
+                ProseText(title, markdown: false).font(.title2.bold()).hiddenOnIOS(isPageTitle)
             }
-            ForEach(paragraphs, id: \.self) { Text(LocalizedStringKey($0)) }
+            ForEach(paragraphs, id: \.self) { ProseText($0) }
         }
         .textSelection(.enabled)
         .frame(maxWidth: 760, alignment: .leading)
@@ -38,7 +38,7 @@ struct IntroView: View {
     ]
 
     var body: some View {
-        ScrollView {
+        FindableScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Feynman Diagrams").font(.system(size: 40, weight: .bold, design: .serif))
@@ -83,7 +83,7 @@ struct IntroView: View {
                             Button(step.title) { navigate(step.page) }
                                 .linkButtonStyle()
                                 .font(.headline)
-                            Text(step.detail).font(.callout).foregroundStyle(.secondary)
+                            ProseText(step.detail).font(.callout).foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -121,7 +121,7 @@ struct IntroView: View {
 
 struct LinesView: View {
     var body: some View {
-        ScrollView {
+        FindableScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Section_("The cast of lines", isPageTitle: true, [
                     "Each kind of particle has its own line style. Learn these and you can read almost any diagram in a particle physics paper.",
@@ -135,16 +135,16 @@ struct LinesView: View {
                             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.separator))
                         VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 8) {
-                                Text(style.title).font(.headline).foregroundStyle(style.color == .primary ? Color.primary : style.color)
+                                ProseText(style.title, markdown: false).font(.headline).foregroundStyle(style.color == .primary ? Color.primary : style.color)
                                 Text(style.family)
                                     .font(.caption.weight(.semibold))
                                     .padding(.horizontal, 7).padding(.vertical, 2)
                                     .background(Capsule().fill(style.color.opacity(0.15)))
                                     .foregroundStyle(style.color == .primary ? Color.secondary : style.color)
                             }
-                            Text(style.drawing).font(.subheadline.italic()).foregroundStyle(.secondary)
-                            Text(style.examples).font(.callout)
-                            Text(LocalizedStringKey(style.summary)).font(.callout).foregroundStyle(.secondary)
+                            ProseText(style.drawing, markdown: false).font(.subheadline.italic()).foregroundStyle(.secondary)
+                            ProseText(style.examples, markdown: false).font(.callout)
+                            ProseText(style.summary).font(.callout).foregroundStyle(.secondary)
                         }
                         .frame(maxWidth: 520, alignment: .leading)
                         .textSelection(.enabled)
@@ -274,7 +274,7 @@ struct VertexExplorerView: View {
     var body: some View {
         let reading = Self.reading(angle)
         let story = Self.stories.first { $0.key == Self.key(reading) }
-        ScrollView {
+        FindableScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 Section_("One vertex, six stories", isPageTitle: true, [
                     "QED has exactly **one** basic vertex: two fermion legs and one photon leg. Rotate it, and read it with time running left to right. Legs on the left are *incoming*; legs on the right are *outgoing*.",
@@ -310,7 +310,7 @@ struct VertexExplorerView: View {
                         }
                         .font(.system(size: 24, design: .serif))
                         .textSelection(.enabled)
-                        Text(story?.text ?? "").font(.callout).textSelection(.enabled)
+                        ProseText(story?.text ?? "").font(.callout).textSelection(.enabled)
                         Divider()
                         Text("Jump to:").font(.caption.bold()).foregroundStyle(.secondary)
                         ForEach(Self.stories, id: \.key) { s in

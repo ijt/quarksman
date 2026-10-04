@@ -9,12 +9,21 @@ struct FeynmanDemoApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     #endif
 
+    @State private var find = FindModel()
+
     var body: some Scene {
         WindowGroup("Feynman Diagrams") {
             ContentView()
+                .environment(find)
                 #if os(macOS)
                 .frame(minWidth: 1050, minHeight: 700)
                 #endif
+        }
+        .commands {
+            CommandGroup(after: .textEditing) {
+                Button("Find…") { find.show() }
+                    .keyboardShortcut("f", modifiers: .command)
+            }
         }
         #if os(macOS)
         Settings { SettingsView() }
@@ -43,6 +52,7 @@ struct ContentView: View {
     @State private var showAsk = false
     @State private var ask = AskModel()
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(FindModel.self) private var find
 
     var body: some View {
         NavigationSplitView {
@@ -72,13 +82,19 @@ struct ContentView: View {
             }
             .navigationSplitViewColumnWidth(min: 230, ideal: 260)
         } detail: {
-            switch page ?? .intro {
-            case .intro: IntroView(navigate: { page = $0 })
-            case .lines: LinesView()
-            case .vertex: VertexExplorerView()
-            case .orders: OrdersView()
-            case .quiz: QuizView()
-            case .diagram(let id): DiagramDetailView(diagram: .named(id))
+            Group {
+                switch page ?? .intro {
+                case .intro: IntroView(navigate: { page = $0 })
+                case .lines: LinesView()
+                case .vertex: VertexExplorerView()
+                case .orders: OrdersView()
+                case .quiz: QuizView()
+                case .diagram(let id): DiagramDetailView(diagram: .named(id))
+                }
+            }
+            .onPreferenceChange(FindBlocksKey.self) { find.blocks = $0 }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if find.isPresented { FindBar(find: find) }
             }
         }
         .onPreferenceChange(PageContextKey.self) { context = $0 }
@@ -89,6 +105,12 @@ struct ContentView: View {
                 .inspectorColumnWidth(min: 300, ideal: 360, max: 520)
         }
         .toolbar {
+            #if os(iOS)
+            // iPhones often have no keyboard for ⌘F.
+            ToolbarItem {
+                Button { find.isPresented ? find.hide() : find.show() } label: { Label("Find", systemImage: "magnifyingglass") }
+            }
+            #endif
             ToolbarItem {
                 Button { showAsk.toggle() } label: { Label("Ask Claude", systemImage: "sparkles") }
                     .keyboardShortcut("k", modifiers: .command)

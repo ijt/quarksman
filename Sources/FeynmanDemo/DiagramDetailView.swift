@@ -8,7 +8,7 @@ struct DiagramDetailView: View {
     @State private var playing = false
 
     var body: some View {
-        ScrollView {
+        FindableScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 header
 
@@ -27,7 +27,7 @@ struct DiagramDetailView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    ForEach(diagram.details, id: \.self) { Text(LocalizedStringKey($0)) }
+                    ForEach(diagram.details, id: \.self) { ProseText($0) }
                 }
                 .font(.body)
                 .textSelection(.enabled)
@@ -82,8 +82,8 @@ struct DiagramDetailView: View {
                     .padding(.horizontal, 8).padding(.vertical, 3)
                     .background(Capsule().fill(.quaternary))
             }
-            Text(diagram.process).font(.system(size: 30, weight: .semibold, design: .serif))
-            Text(diagram.summary).font(.title3).foregroundStyle(.secondary)
+            ProseText(diagram.process, markdown: false).font(.system(size: 30, weight: .semibold, design: .serif))
+            ProseText(diagram.summary, markdown: false).font(.title3).foregroundStyle(.secondary)
         }
         .textSelection(.enabled)
     }
@@ -127,7 +127,7 @@ struct DiagramDetailView: View {
             Text("Putting the rules together").font(.headline)
             Text("Multiply the factors for every line and vertex to get the amplitude 𝓜. The probability is ∝ |𝓜|².")
                 .font(.callout).foregroundStyle(.secondary)
-            Text(diagram.amplitude)
+            ProseText(diagram.amplitude, markdown: false)
                 .font(.system(size: 16, design: .serif))
                 .textSelection(.enabled)
                 .padding(12)

@@ -14,7 +14,7 @@ struct OrdersView: View {
     private let g2Counts: [(Int, String)] = [(1, "1"), (2, "7"), (3, "72"), (4, "891"), (5, "12,672")]
 
     var body: some View {
-        ScrollView {
+        FindableScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 Section_("Orders & loops", isPageTitle: true, [
                     "A physical amplitude is an infinite sum over diagrams, organized by the number of vertices:",
