@@ -9,6 +9,7 @@ struct Section_: View {
             Text(title).font(.title2.bold())
             ForEach(paragraphs, id: \.self) { Text(LocalizedStringKey($0)) }
         }
+        .textSelection(.enabled)
         .frame(maxWidth: 760, alignment: .leading)
     }
 }
@@ -25,6 +26,7 @@ struct IntroView: View {
                     Text("Feynman Diagrams").font(.system(size: 40, weight: .bold, design: .serif))
                     Text("Pictures that are also equations.").font(.title2).foregroundStyle(.secondary)
                 }
+                .textSelection(.enabled)
 
                 Section_("What are they?", [
                     "In 1948 Richard Feynman introduced a way to draw particle interactions. Each picture stands for a precise mathematical term in a calculation. Each line and vertex has a **Feynman rule** that turns it into a factor, and multiplying the factors gives the **amplitude** 𝓜 for the process.",
@@ -39,7 +41,7 @@ struct IntroView: View {
                         Text("Drag time forward:").foregroundStyle(.secondary)
                         Slider(value: $time, in: 0...1)
                     }
-                    Text(stateDescription).font(.callout).foregroundStyle(.secondary)
+                    Text(stateDescription).font(.callout).foregroundStyle(.secondary).textSelection(.enabled)
                 }
                 .frame(maxWidth: 760)
 
@@ -114,6 +116,7 @@ struct LinesView: View {
                             Text(LocalizedStringKey(style.summary)).font(.callout).foregroundStyle(.secondary)
                         }
                         .frame(maxWidth: 520, alignment: .leading)
+                        .textSelection(.enabled)
                     }
                 }
 
@@ -275,7 +278,8 @@ struct VertexExplorerView: View {
                             Text(reading.final.joined(separator: " + "))
                         }
                         .font(.system(size: 24, design: .serif))
-                        Text(story?.text ?? "").font(.callout)
+                        .textSelection(.enabled)
+                        Text(story?.text ?? "").font(.callout).textSelection(.enabled)
                         Divider()
                         Text("Jump to:").font(.caption.bold()).foregroundStyle(.secondary)
                         ForEach(Self.stories, id: \.key) { s in

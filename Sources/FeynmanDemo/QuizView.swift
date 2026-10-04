@@ -62,7 +62,7 @@ struct QuizView: View {
                 }
                 .frame(maxWidth: 760)
 
-                Text(question.prompt).font(.title2.bold())
+                Text(question.prompt).font(.title2.bold()).textSelection(.enabled)
 
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(question.options, id: \.self) { option in
@@ -92,7 +92,7 @@ struct QuizView: View {
                               systemImage: chosen == question.answer ? "star.fill" : "info.circle")
                             .font(.headline)
                             .foregroundStyle(chosen == question.answer ? .green : .orange)
-                        Text(question.explanation).frame(maxWidth: 600, alignment: .leading)
+                        Text(question.explanation).frame(maxWidth: 600, alignment: .leading).textSelection(.enabled)
                         Button("Next question") { next() }
                             .keyboardShortcut(.return, modifiers: [])
                             .buttonStyle(.borderedProminent)

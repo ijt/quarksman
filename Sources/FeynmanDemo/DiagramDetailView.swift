@@ -31,6 +31,7 @@ struct DiagramDetailView: View {
                     ForEach(diagram.details, id: \.self) { Text(LocalizedStringKey($0)) }
                 }
                 .font(.body)
+                .textSelection(.enabled)
                 .frame(maxWidth: 760, alignment: .leading)
 
                 amplitudeBox
@@ -85,6 +86,7 @@ struct DiagramDetailView: View {
             Text(diagram.process).font(.system(size: 30, weight: .semibold, design: .serif))
             Text(diagram.summary).font(.title3).foregroundStyle(.secondary)
         }
+        .textSelection(.enabled)
     }
 
     private var timeControls: some View {

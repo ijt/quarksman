@@ -21,6 +21,7 @@ struct OrdersView: View {
                 ])
                 Text("𝓜 = 𝓜_tree + 𝓜_1-loop + 𝓜_2-loop + …")
                     .font(.system(size: 22, design: .serif))
+                    .textSelection(.enabled)
 
                 HStack(alignment: .top, spacing: 16) {
                     miniDiagram(.moller, caption: "Tree level: 2 vertices, 𝓜 ∝ e²")

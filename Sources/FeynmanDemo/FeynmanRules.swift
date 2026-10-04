@@ -125,6 +125,7 @@ struct SelectionInfoView: View {
             }
             Spacer(minLength: 0)
         }
+        .textSelection(.enabled)
         .padding(14)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(RoundedRectangle(cornerRadius: 14).fill(.background.secondary))
