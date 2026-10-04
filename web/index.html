@@ -92,6 +92,22 @@ main { min-width: 0; padding-inline: 36px; padding-block: 0 72px; container-type
 .prose h2 { margin-bottom: 2px; }
 .lede { font-size: 18px; color: var(--muted); max-width: 60ch; }
 .next a { font-weight: 600; }
+.shell-figure { margin: 0; display: grid; gap: 10px; max-width: 780px; }
+.shell .axis-line { stroke: var(--muted); stroke-width: 1.2; }
+.shell .axis-label, .shell .point-label { font: 500 13px var(--body); fill: var(--muted); }
+.shell .point-label { fill: var(--ink); }
+.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.legend li { display: flex; gap: 10px; align-items: baseline; }
+.swatch { flex: none; width: 22px; height: 10px; position: relative; top: 1px; }
+.swatch.line { border-top: 3px solid var(--c); height: 0; top: -3px; }
+.swatch.dash { border-top: 2px dashed var(--c); height: 0; top: -3px; }
+.swatch.dot::after, .swatch.ring::after { content: ""; position: absolute; left: 6px; top: 0; width: 10px; height: 10px; border-radius: 50%; }
+.swatch.dot::after { background: var(--c); }
+.swatch.ring::after { border: 2px solid var(--c); box-sizing: border-box; }
+.shell-figure figcaption { font-size: 14px; color: var(--muted); }
+.primer { border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); background: color-mix(in srgb, var(--accent) 7%, var(--surface)); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; max-width: 780px; }
+.primer h3 { font: 600 16px var(--body); color: var(--accent); }
+.family { display: inline-block; margin-left: 10px; font: 600 12px/1 var(--body); padding: 4px 8px; border-radius: 999px; vertical-align: middle; color: var(--c); background: color-mix(in srgb, var(--c) 15%, transparent); }
 .next span { display: block; color: var(--muted); font-size: 14px; }
 
 /* Diagram plates */
@@ -279,15 +295,15 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /* ---------- particles & line styles ---------- */
 const STYLES = {
-  fermion: { title: "Fermions (matter)", drawing: "Solid line with an arrow", examples: "e⁻, μ⁻, ν, quarks u d s c b t — and their antiparticles",
+  fermion: { family: "Fermion · spin ½", title: "Fermions (matter)", drawing: "Solid line with an arrow", examples: "e⁻, μ⁻, ν, quarks u d s c b t — and their antiparticles",
     summary: "The arrow tracks the flow of particle number, not the direction of motion. An arrow pointing forward in time is a particle; an arrow pointing backward in time is its antiparticle moving forward. Arrows never start or stop at a vertex — fermion lines are continuous." },
-  photon: { title: "Photon", drawing: "Wavy line", examples: "γ — the electromagnetic force carrier",
+  photon: { family: "Boson · spin 1", title: "Photon", drawing: "Wavy line", examples: "γ — the electromagnetic force carrier",
     summary: "Couples to electric charge with strength e, the elementary charge (≈ 0.30 in natural units, so α = e²/4π ≈ 1/137). Photons are neutral, so two photons never meet at a vertex." },
-  gluon: { title: "Gluon", drawing: "Curly (coiled) line", examples: "g — the strong force carrier (8 colors)",
+  gluon: { family: "Boson · spin 1", title: "Gluon", drawing: "Curly (coiled) line", examples: "g — the strong force carrier (8 colors)",
     summary: "Couples to color charge with strength g_s. Gluons carry color themselves, so there are three- and four-gluon vertices. This self-interaction leads to confinement." },
-  weak: { title: "W and Z bosons", drawing: "Long wavy line", examples: "W⁺, W⁻, Z⁰ — the weak force carriers",
+  weak: { family: "Boson · spin 1", title: "W and Z bosons", drawing: "Long wavy line", examples: "W⁺, W⁻, Z⁰ — the weak force carriers",
     summary: "Very heavy: the W weighs 80 GeV and the Z 91 GeV, about 100 proton masses. The weak coupling is actually stronger than electromagnetism's, but at everyday energies the heavy mass suppresses the propagator, 1/(q² − M²) ≈ −1/M². That suppression is why the force seems weak. The W also changes flavor: it turns d into u, or e⁻ into νₑ." },
-  higgs: { title: "Higgs boson", drawing: "Dashed line", examples: "H — spin-0 excitation of the Higgs field",
+  higgs: { family: "Boson · spin 0", title: "Higgs boson", drawing: "Dashed line", examples: "H — spin-0 excitation of the Higgs field",
     summary: "Couples to particles in proportion to their mass. A dashed line is the generic notation for any spin-0 (scalar) particle." },
 };
 
@@ -399,6 +415,11 @@ const CATALOG = [
       "The W vertex couples only to left-handed particles, through the factor (1 − γ⁵). This is where parity violation comes from.",
     ],
     amplitude: "𝓜 ≈ (g² / 8M²_W) [ū_u γ^μ(1 − γ⁵) u_d] [ū_e γ_μ(1 − γ⁵) v_ν],   G_F/√2 = g²/8M²_W",
+    primer: { title: "New here: quarks", paragraphs: [
+      "Protons and neutrons aren't elementary particles. Each is made of three **quarks**.",
+      "The two lightest are the **up** quark (u, charge +⅔) and the **down** quark (d, charge −⅓). A proton is uud: +⅔ + ⅔ − ⅓ = +1. A neutron is udd: +⅔ − ⅓ − ⅓ = 0.",
+      "Quarks are always bound inside particles like these, held together by gluons. Nobody has ever seen one on its own.",
+    ], link: { title: "See how quarks are drawn in the cast of lines", href: "#lines" } },
     nodes: [X("a", .04, .55), V("v1", .4, .55), X("c", .96, .55), V("v2", .66, .22), X("e", .96, .05), X("f", .96, .36),
       X("s1", .04, .72), X("s2", .96, .72), X("s3", .04, .88), X("s4", .96, .88)],
     edges: [E("a", "v1", P.down), E("v1", "c", P.up), E("v1", "v2", P.wMinus, { label: "W*" }), E("v2", "e", P.electron),
@@ -692,6 +713,7 @@ function diagramContext(d, selection, time) {
     `Diagram: ${d.title} — process ${d.process} (${INTERACTIONS[d.interaction].title}).`,
     `Time runs left to right. ${d.vertices.length} vertices, ${d.internal.length} internal lines, ${d.loops} loop(s).`,
     `Summary: ${d.summary}`,
+    ...(d.primer ? [`Primer box "${d.primer.title}": ${d.primer.paragraphs.join(" ")}`] : []),
     ...d.details.map(s => "• " + s),
     `Amplitude shown: ${d.amplitude}`,
     "Lines:",
@@ -709,6 +731,43 @@ function diagramContext(d, selection, time) {
 
 /* ---------- shared bits ---------- */
 const section = (title, paragraphs) => `<section class="prose">${title ? `<h2>${esc(title)}</h2>` : ""}${paragraphs.map(p => `<p>${md(p)}</p>`).join("")}</section>`;
+/** Energy vs. momentum: the mass shell of a massive particle, the photon's shell, and real vs. virtual particles. */
+function massShellFigure() {
+  const W = 760, H = 300, m = { l: 20, r: 20, t: 16, b: 32 };
+  const x = d3.scaleLinear().domain([-3, 3]).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain([0, 3.4]).range([H - m.b, m.t]);
+  const svg = d3.create("svg").attr("class", "diagram shell").attr("viewBox", `0 0 ${W} ${H}`)
+    .attr("role", "img").attr("aria-label", "Plot of energy against momentum showing the mass shell, the photon's light cone, and on-shell and off-shell points");
+  svg.append("line").attr("class", "axis-line").attr("x1", x(-3)).attr("x2", x(3)).attr("y1", y(0)).attr("y2", y(0));
+  svg.append("line").attr("class", "axis-line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", y(0)).attr("y2", y(3.4));
+  svg.append("text").attr("class", "axis-label").attr("x", x(3)).attr("y", y(0) + 22).attr("text-anchor", "end").text("momentum p");
+  svg.append("text").attr("class", "axis-label").attr("x", x(0) + 8).attr("y", y(3.4) + 12).text("energy E");
+  const ps = d3.range(-3, 3.0001, 0.05);
+  const curve = f => d3.line().x(p => x(p)).y(p => y(f(p)))(ps.filter(p => f(p) <= 3.4));
+  svg.append("path").attr("d", curve(Math.abs)).attr("fill", "none").attr("stroke", "var(--photon)").attr("stroke-width", 2).attr("stroke-dasharray", "7 6");
+  svg.append("path").attr("d", curve(p => Math.sqrt(p * p + 1))).attr("fill", "none").attr("stroke", "var(--accent)").attr("stroke-width", 3);
+  const dot = (p, e, filled, color, label, anchor) => {
+    svg.append("circle").attr("cx", x(p)).attr("cy", y(e)).attr("r", 6).attr("fill", filled ? color : "var(--surface)").attr("stroke", color).attr("stroke-width", 2.5);
+    svg.append("text").attr("class", "point-label").attr("x", x(p) + (anchor === "end" ? -12 : 12)).attr("y", y(e) + (anchor === "end" ? -10 : 5))
+      .attr("text-anchor", anchor).text(label);
+  };
+  dot(1.2, Math.sqrt(1.44 + 1), true, "var(--accent)", "e⁻", "start");
+  dot(0, 2.6, false, "var(--photon)", "γ* in e⁺e⁻ → μ⁺μ⁻", "start");
+  dot(1.9, 0.45, false, "var(--photon)", "γ* in Møller", "end");
+  const fig = el(`<figure class="shell-figure">
+    <div class="plate"></div>
+    <ul class="legend">
+      <li><span class="swatch line" style="--c:var(--accent)"></span>Mass shell of a massive particle: E² = p² + m²</li>
+      <li><span class="swatch dash" style="--c:var(--photon)"></span>Photon shell (m = 0): E = |p|</li>
+      <li><span class="swatch dot" style="--c:var(--accent)"></span>Real electron: on its shell</li>
+      <li><span class="swatch ring" style="--c:var(--photon)"></span>Virtual photons: off their shell. Inside the cone q² &gt; 0 (s-channel); outside it q² &lt; 0 (t-channel)</li>
+    </ul>
+    <figcaption>In three dimensions of momentum the curve becomes a bowl-shaped surface, a hyperboloid. That surface is the "shell". A virtual particle can sit anywhere energy and momentum conservation puts it, on or off its shell.</figcaption>
+  </figure>`);
+  fig.querySelector(".plate").append(svg.node());
+  return fig;
+}
+
 function plate(view) { const p = el(`<div class="plate"></div>`); p.append(view.node); return p; }
 function lineSample(style, arrow) {
   const svg = d3.create("svg").attr("class", "diagram").attr("viewBox", "0 0 260 60").attr("aria-hidden", "true");
@@ -742,6 +801,7 @@ function introPage() {
       "**External lines** stick out of the diagram. They're the real particles you send in and detect. **Internal lines** run between two vertices. They're *virtual* particles that are never observed.",
       "**On-shell and off-shell.** A real particle's energy and momentum always satisfy E² = p² + m² (in units where c = 1). Plotted in energy–momentum space, the allowed points form a curved surface called the **mass shell**. Real particles are **on-shell**. Virtual particles can be **off-shell**: energy and momentum are still conserved at every vertex, but the particle doesn't have the \"right\" mass for its momentum. Diagrams often write this using q² = E² − p², so on-shell means q² = m².",
     ])}
+    <div data-slot="massshell"></div>
     ${section("The key idea: perturbation theory", [
       "Every vertex brings one factor of the coupling constant. In QED that's the electron's charge e (the elementary charge, not Euler's number 2.718…). In the units physicists use here, e is a pure number, about 0.30, and the fine-structure constant is α = e²/4π ≈ 1/137. Diagrams with more vertices are suppressed by more powers of α.",
       "You can therefore start with the simplest diagrams (**tree level**) and add **loop** corrections for more precision. Each loop typically costs a factor of about α/π ≈ 0.002.",
@@ -754,6 +814,7 @@ function introPage() {
       <p class="next"><a href="#quiz">Quiz</a><span>Test yourself.</span></p>
     </section>
   </article>`);
+  root.querySelector('[data-slot="massshell"]').replaceWith(massShellFigure());
   const range = root.querySelector("#intro-time"), stateEl = root.querySelector('[data-slot="state"]');
   const view = diagramView(d, { onSlice: t => { time = t; refresh(); } });
   root.querySelector('[data-slot="plate"]').replaceWith(plate(view));
@@ -782,7 +843,7 @@ function linesPage() {
   const cast = root.querySelector(".cast");
   for (const [key, s] of Object.entries(STYLES)) {
     const row = el(`<div class="cast-row" style="--c: var(--${key})"><div class="plate"></div><div class="prose">
-      <h3>${esc(s.title)}</h3><p class="how">${esc(s.drawing)}</p><p class="math">${esc(s.examples)}</p><p class="muted">${md(s.summary)}</p></div></div>`);
+      <h3>${esc(s.title)}<span class="family">${esc(s.family)}</span></h3><p class="how">${esc(s.drawing)}</p><p class="math">${esc(s.examples)}</p><p class="muted">${md(s.summary)}</p></div></div>`);
     row.querySelector(".plate").append(lineSample(key));
     cast.append(row);
   }
@@ -794,7 +855,7 @@ function linesPage() {
   }
   return { el: root, context: () => ({
     title: "The cast of lines",
-    body: "Page listing line styles:\n" + Object.values(STYLES).map(s => `• ${s.title}: ${s.drawing}. ${s.examples}. ${s.summary}`).join("\n") + "\nAlso explains that a positron is an electron line with its arrow pointing backward in time.",
+    body: "Page listing line styles:\n" + Object.values(STYLES).map(s => `• ${s.title} (${s.family}): ${s.drawing}. ${s.examples}. ${s.summary}`).join("\n") + "\nAlso explains that a positron is an electron line with its arrow pointing backward in time.",
     suggestions: ["Why does the fermion arrow point backward for antiparticles?", "Why can gluons interact with each other but photons can't?", "Why are the W and Z so heavy?"],
   }) };
 }
@@ -925,6 +986,7 @@ function processPage(d) {
       </div>
       <div class="inspector" data-slot="inspector" aria-live="polite"></div>
     </div>
+    ${d.primer ? `<aside class="primer"><h3>💡 ${esc(d.primer.title)}</h3>${d.primer.paragraphs.map(p => `<p>${md(p)}</p>`).join("")}<a href="${d.primer.link.href}">${esc(d.primer.link.title)}</a></aside>` : ""}
     <section class="prose">${d.details.map(p => `<p>${md(p)}</p>`).join("")}</section>
     <section class="prose" style="max-width:820px">
       <h2>Putting the rules together</h2>
