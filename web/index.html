@@ -91,6 +91,8 @@ main { min-width: 0; padding-inline: 36px; padding-block: 0 72px; container-type
 .prose { max-width: 68ch; display: grid; gap: 10px; }
 .prose h2 { margin-bottom: 2px; }
 .lede { font-size: 18px; color: var(--muted); max-width: 60ch; }
+.next a { font-weight: 600; }
+.next span { display: block; color: var(--muted); font-size: 14px; }
 
 /* Diagram plates */
 .plate { background-color: var(--surface); background-image: radial-gradient(var(--grid) 1px, transparent 1.3px); background-size: 22px 22px; border: 1px solid var(--rule); border-radius: 10px; min-width: 0; }
@@ -280,11 +282,11 @@ const STYLES = {
   fermion: { title: "Fermions (matter)", drawing: "Solid line with an arrow", examples: "e⁻, μ⁻, ν, quarks u d s c b t — and their antiparticles",
     summary: "The arrow tracks the flow of particle number, not the direction of motion. An arrow pointing forward in time is a particle; an arrow pointing backward in time is its antiparticle moving forward. Arrows never start or stop at a vertex — fermion lines are continuous." },
   photon: { title: "Photon", drawing: "Wavy line", examples: "γ — the electromagnetic force carrier",
-    summary: "Couples to electric charge with strength e (α = e²/4π ≈ 1/137). Photons are neutral, so two photons never meet at a vertex." },
+    summary: "Couples to electric charge with strength e, the elementary charge (≈ 0.30 in natural units, so α = e²/4π ≈ 1/137). Photons are neutral, so two photons never meet at a vertex." },
   gluon: { title: "Gluon", drawing: "Curly (coiled) line", examples: "g — the strong force carrier (8 colors)",
     summary: "Couples to color charge with strength g_s. Gluons carry color themselves, so there are three- and four-gluon vertices. This self-interaction leads to confinement." },
   weak: { title: "W and Z bosons", drawing: "Long wavy line", examples: "W⁺, W⁻, Z⁰ — the weak force carriers",
-    summary: "Massive (80–91 GeV), so their propagators are suppressed at low energies — that's why the weak force is weak. The W changes flavor: it turns d into u, or e⁻ into νₑ." },
+    summary: "Very heavy: the W weighs 80 GeV and the Z 91 GeV, about 100 proton masses. The weak coupling is actually stronger than electromagnetism's, but at everyday energies the heavy mass suppresses the propagator, 1/(q² − M²) ≈ −1/M². That suppression is why the force seems weak. The W also changes flavor: it turns d into u, or e⁻ into νₑ." },
   higgs: { title: "Higgs boson", drawing: "Dashed line", examples: "H — spin-0 excitation of the Higgs field",
     summary: "Couples to particles in proportion to their mass. A dashed line is the generic notation for any spin-0 (scalar) particle." },
 };
@@ -347,7 +349,7 @@ const CATALOG = [
     summary: "An electron and positron annihilate into a virtual photon, which then turns into a muon–antimuon pair.",
     details: [
       "Read it left to right. At the first vertex the electron and positron disappear and a **virtual photon** appears. At the second vertex the photon turns into a muon and an antimuon.",
-      "This is an **s-channel** diagram: the virtual photon carries the whole collision energy, so q² = s = E²ᶜᵐ. A real photon always has q² = 0, so this photon is **off-shell**. That's allowed only because it is never observed.",
+      "This is an **s-channel** diagram: the virtual photon carries the whole collision energy, so q² = s = E²ᶜᵐ. A real photon always has q² = 0 (it's massless), so this photon is **off-shell**: it isn't on the mass shell q² = m² that real particles satisfy. That's allowed only because it is never observed.",
       "There are two vertices, so the amplitude goes as e² and the cross-section as α². Working through the Feynman rules gives the textbook result σ = 4πα²/3s.",
     ],
     amplitude: "𝓜 = [v̄(p₂)(−ieγ^μ)u(p₁)] · (−ig_μν / q²) · [ū(p₃)(−ieγ^ν)v(p₄)]",
@@ -391,7 +393,7 @@ const CATALOG = [
   D({ id: "beta", title: "Neutron β decay", process: "n → p e⁻ ν̄ₑ", interaction: "weak",
     summary: "A down quark inside a neutron emits a virtual W⁻ and becomes an up quark, turning the neutron into a proton.",
     details: [
-      "The neutron (udd) becomes a proton (uud). The virtual W⁻ carries away one unit of negative charge and decays to an electron and an electron antineutrino.",
+      "Reading the quark lines top to bottom, the neutron (ddu) becomes a proton (udu). The order is just how they're drawn; books usually write udd and uud. The virtual W⁻ carries away one unit of negative charge and decays to an electron and an electron antineutrino.",
       "The W is about 80,000 times heavier than the ~1 MeV of energy released. Its propagator 1/(q² − M²_W) ≈ −1/M²_W is therefore tiny. That's why the weak force is weak, and why a free neutron lives about 15 minutes.",
       "The other two quarks are **spectators**. They don't touch any vertex.",
       "The W vertex couples only to left-handed particles, through the factor (1 − γ⁵). This is where parity violation comes from.",
@@ -399,8 +401,8 @@ const CATALOG = [
     amplitude: "𝓜 ≈ (g² / 8M²_W) [ū_u γ^μ(1 − γ⁵) u_d] [ū_e γ_μ(1 − γ⁵) v_ν],   G_F/√2 = g²/8M²_W",
     nodes: [X("a", .04, .55), V("v1", .4, .55), X("c", .96, .55), V("v2", .66, .22), X("e", .96, .05), X("f", .96, .36),
       X("s1", .04, .72), X("s2", .96, .72), X("s3", .04, .88), X("s4", .96, .88)],
-    edges: [E("a", "v1", P.down), E("v1", "c", P.up), E("v1", "v2", P.wMinus), E("v2", "e", P.electron),
-      E("v2", "f", P.antiNuE, { side: 1 }), E("s1", "s2", P.up), E("s3", "s4", P.down)] }),
+    edges: [E("a", "v1", P.down), E("v1", "c", P.up), E("v1", "v2", P.wMinus, { label: "W*" }), E("v2", "e", P.electron),
+      E("v2", "f", P.antiNuE, { side: 1 }), E("s1", "s2", P.down), E("s3", "s4", P.up)] }),
   D({ id: "qq", title: "Quark scattering", process: "u d → u d", interaction: "qcd",
     summary: "Two quarks scatter by exchanging a virtual gluon — the strong-force version of Møller scattering.",
     details: [
@@ -435,8 +437,8 @@ const CATALOG = [
     nodes: [X("a", .04, .1), V("v1", .5, .14), X("c", .96, .1), V("v2", .5, .36), V("v3", .5, .64),
       X("b", .04, .9), V("v4", .5, .86), X("d", .96, .9)],
     edges: [E("a", "v1", P.electron), E("v1", "c", P.electron), E("b", "v4", P.muon, { side: 1 }), E("v4", "d", P.muon, { side: 1 }),
-      E("v1", "v2", P.photon, { label: "γ*" }), E("v2", "v3", P.electron, { bend: .8, side: 1, label: "e" }),
-      E("v3", "v2", P.electron, { bend: .8, side: 1, label: "e" }), E("v3", "v4", P.photon, { label: "γ*" })] }),
+      E("v1", "v2", P.photon, { label: "γ*" }), E("v2", "v3", P.electron, { bend: .8, side: 1, label: "e*" }),
+      E("v3", "v2", P.electron, { bend: .8, side: 1, label: "e*" }), E("v3", "v4", P.photon, { label: "γ*" })] }),
   D({ id: "g-2", title: "Electron g − 2", process: "e⁻ + field → e⁻ (1 loop)", interaction: "qed",
     summary: "The electron emits and reabsorbs a virtual photon while interacting with a magnetic field. This shifts its magnetic moment.",
     details: [
@@ -458,7 +460,7 @@ const CATALOG = [
     ],
     amplitude: "𝓜 ∝ (m_t/v) e² Q²_t N_c ∫d⁴k Tr[S(k) γ^μ S(k+p₁) γ^ν S(k−p₂)] ε*_μ ε*_ν",
     nodes: [X("a", .04, .5), V("v1", .36, .5), V("v2", .64, .24), V("v3", .64, .76), X("c", .96, .1), X("d", .96, .9)],
-    edges: [E("a", "v1", P.higgs), E("v1", "v2", P.top), E("v2", "v3", P.top), E("v3", "v1", P.top),
+    edges: [E("a", "v1", P.higgs), E("v1", "v2", P.top, { label: "t*" }), E("v2", "v3", P.top, { label: "t*" }), E("v3", "v1", P.top, { label: "t*" }),
       E("v2", "c", P.photon), E("v3", "d", P.photon, { side: 1 })] }),
 ];
 const byId = id => CATALOG.find(d => d.id === id);
@@ -475,7 +477,7 @@ function edgeRule(d, e) {
     const formula = { fermion: "i(q̸ + m) / (q² − m²)", photon: "−i g_μν / q²", gluon: "−i g_μν δᵃᵇ / q²",
       weak: "−i (g_μν − q_μq_ν/M²) / (q² − M²)", higgs: "i / (q² − m²_H)" }[p.style];
     return { title: `Propagator (virtual ${p.name.toLowerCase()})`, formula,
-      text: "Internal lines are **virtual**. They're off-shell, meaning q² ≠ m², and are never observed directly. The propagator is largest when q² is close to m². That's how resonances appear." };
+      text: "Internal lines are **virtual**. They can be off-shell, meaning off the mass shell q² = m² that real particles satisfy, and are never observed directly. The propagator is largest when q² is close to m². That's how resonances appear." };
   }
   const inc = r === "incoming";
   let formula;
@@ -484,7 +486,7 @@ function edgeRule(d, e) {
   else if (p.style === "gluon") formula = (inc ? "ε_μ(p)" : "ε*_μ(p)") + " · color vector";
   else formula = "1";
   return { title: `External ${r} ${p.name.toLowerCase()}`, formula,
-    text: "External lines are **real** particles: on-shell (p² = m²) and seen in the detector. Each one contributes a wavefunction factor: a spinor for fermions, a polarization vector for vector bosons." };
+    text: "External lines are **real** particles: on-shell, meaning their four-momentum satisfies p² = E² − |p⃗|² = m², and seen in the detector. Each one contributes a wavefunction factor: a spinor for fermions, a polarization vector for vector bosons." };
 }
 function vertexRule(d, id) {
   const legs = d.edgesAt(id), styles = legs.map(e => e.p.style);
@@ -723,7 +725,7 @@ function introPage() {
   const d = byId("ee-mumu");
   let time = 0.1;
   const root = el(`<article class="page">
-    <header class="prose"><span class="eyebrow">Introduction</span><h1>Feynman Diagrams</h1><p class="lede">Pictures that are also equations.</p></header>
+    <header class="prose"><span class="eyebrow">Introduction</span><h1>Feynman Diagrams</h1><p class="lede">Pictures that are also equations</p></header>
     ${section("What are they?", [
       "In 1948 Richard Feynman introduced a way to draw particle interactions. Each picture stands for a precise mathematical term in a calculation. Each line and vertex has a **Feynman rule** that turns it into a factor, and multiplying the factors gives the **amplitude** 𝓜 for the process.",
       "To get the probability of a process, add up the amplitudes of *every* diagram with the same incoming and outgoing particles, then square: P ∝ |𝓜₁ + 𝓜₂ + …|².",
@@ -737,18 +739,19 @@ function introPage() {
       "**Time runs left to right** in this app. Some books draw time running upward. The physics is the same.",
       "**Lines are particles.** Straight lines with arrows are matter (fermions). Wavy, curly and dashed lines are force carriers (bosons).",
       "**Vertices are interactions.** At each dot, particles are absorbed or emitted. Charge, energy and momentum are conserved at every vertex.",
-      "**External lines** stick out of the diagram. They're the real particles you send in and detect. **Internal lines** run between two vertices. They're *virtual* particles that are never observed and don't obey E² = p² + m².",
+      "**External lines** stick out of the diagram. They're the real particles you send in and detect. **Internal lines** run between two vertices. They're *virtual* particles that are never observed.",
+      "**On-shell and off-shell.** A real particle's energy and momentum always satisfy E² = p² + m² (in units where c = 1). Plotted in energy–momentum space, the allowed points form a curved surface called the **mass shell**. Real particles are **on-shell**. Virtual particles can be **off-shell**: energy and momentum are still conserved at every vertex, but the particle doesn't have the \"right\" mass for its momentum. Diagrams often write this using q² = E² − p², so on-shell means q² = m².",
     ])}
     ${section("The key idea: perturbation theory", [
-      "Every vertex brings one factor of the coupling constant. In QED that's e, with α = e²/4π ≈ 1/137. Diagrams with more vertices are suppressed by more powers of α.",
+      "Every vertex brings one factor of the coupling constant. In QED that's the electron's charge e (the elementary charge, not Euler's number 2.718…). In the units physicists use here, e is a pure number, about 0.30, and the fine-structure constant is α = e²/4π ≈ 1/137. Diagrams with more vertices are suppressed by more powers of α.",
       "You can therefore start with the simplest diagrams (**tree level**) and add **loop** corrections for more precision. Each loop typically costs a factor of about α/π ≈ 0.002.",
     ])}
     <section class="prose"><h2>Where to go next</h2>
-      <p>• <a href="#lines">The cast of lines</a> — the visual vocabulary.</p>
-      <p>• <a href="#vertex">One vertex, six stories</a> — rotate a single vertex to see emission, absorption, pair creation and annihilation.</p>
-      <p>• <a href="#p-ee-mumu">Processes</a> — ten real processes. Click lines to inspect them and drag the time slice.</p>
-      <p>• <a href="#orders">Orders &amp; loops</a> — why perturbation theory works for QED but not for low-energy QCD.</p>
-      <p>• <a href="#quiz">Quiz</a> — test yourself.</p>
+      <p class="next"><a href="#lines">The cast of lines</a><span>The visual vocabulary</span></p>
+      <p class="next"><a href="#vertex">One vertex, six stories</a><span>Rotate a single vertex to see emission, absorption, pair creation and annihilation.</span></p>
+      <p class="next"><a href="#p-ee-mumu">Processes</a><span>Ten real processes. Click lines to inspect them and drag the time slice.</span></p>
+      <p class="next"><a href="#orders">Orders &amp; loops</a><span>Why perturbation theory works for QED but not for low-energy QCD.</span></p>
+      <p class="next"><a href="#quiz">Quiz</a><span>Test yourself.</span></p>
     </section>
   </article>`);
   const range = root.querySelector("#intro-time"), stateEl = root.querySelector('[data-slot="state"]');
@@ -953,10 +956,10 @@ function processPage(d) {
 
   function inspectorHTML() {
     if (selection?.edge != null) {
-      const e = d.edges[selection.edge], r = edgeRule(d, e);
-      return `<div style="display:flex;gap:12px;align-items:center"><span class="big" style="color:var(--${e.p.style})">${esc(e.p.symbol)}</span>
-        <div><b>${esc(e.p.name)}</b><div class="small muted">${esc(r.title)}</div></div></div>
-        <dl><dt>Charge</dt><dd>${esc(e.p.charge)}</dd><dt>Spin</dt><dd>${esc(e.p.spin)}</dd><dt>Mass</dt><dd>${esc(e.p.mass)}</dd></dl>
+      const e = d.edges[selection.edge], r = edgeRule(d, e), virtual = d.isInternal(e);
+      return `<div style="display:flex;gap:12px;align-items:center"><span class="big" style="color:var(--${e.p.style})">${esc(e.label)}</span>
+        <div><b>${esc(virtual ? "Virtual " + e.p.name.toLowerCase() : e.p.name)}</b><div class="small muted">${esc(r.title)}</div></div></div>
+        <dl><dt>Charge</dt><dd>${esc(e.p.charge)}</dd><dt>Spin</dt><dd>${esc(e.p.spin)}</dd><dt>${virtual ? "Mass when real" : "Mass"}</dt><dd>${esc(e.p.mass)}</dd></dl>
         <p class="small">${esc(e.p.blurb)}</p>
         <div class="eyebrow">Feynman rule</div><div class="formula">${esc(r.formula)}</div><p class="small">${md(r.text)}</p>`;
     }
