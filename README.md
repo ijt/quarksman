@@ -5,6 +5,7 @@ An interactive SwiftUI app for learning to read Feynman diagrams, for macOS, iPh
 - **Learn**: what the diagrams mean, the line styles for each particle, and a rotatable QED vertex.
 - **Processes**: ten real processes (e⁺e⁻ → μ⁺μ⁻, Compton scattering, β decay, Higgs → γγ, …). Click any line or vertex to see its Feynman rule, and drag a time slice to see which particles exist at each moment.
 - **Orders & loops** and a **quiz**.
+- **Diagram Builder**: a puzzle game. Build a valid Feynman diagram for each process, with the fewest vertices for three stars.
 - **Ask Claude** (⌘K): questions about the page you're on, answered by Claude with the page's contents as context.
 - **Find** (⌘F) on any page.
 
@@ -29,6 +30,14 @@ Requires iOS 17 or later. Tested with Xcode 27 and the iOS 27 simulator.
 To run on your own device, select your team under **Signing & Capabilities**, and change the bundle ID (`com.issactrotts.FeynmanDiagrams` in `project.yml`) if Xcode says it's taken.
 
 If you don't have a simulator, install one from **Xcode → Settings → Components**, or run `xcodebuild -downloadPlatform iOS`.
+
+## Tests
+
+```sh
+swift test
+```
+
+The tests cover the Diagram Builder's physics rules (vertex types, fermion arrows, charge and flavor conservation).
 
 ## Ask Claude
 
