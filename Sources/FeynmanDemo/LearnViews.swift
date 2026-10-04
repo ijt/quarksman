@@ -35,7 +35,7 @@ struct IntroView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     DiagramCard {
-                        DiagramView(diagram: .eeToMuMu, timeSlice: time).frame(height: 300)
+                        DiagramView(diagram: .eeToMuMu, timeSlice: time).adaptiveHeight(300, compact: 230)
                     }
                     HStack {
                         Text("Drag time forward:").foregroundStyle(.secondary)
@@ -104,7 +104,7 @@ struct LinesView: View {
                 ])
 
                 ForEach(LineStyle.allCases) { style in
-                    HStack(alignment: .top, spacing: 18) {
+                    AdaptiveStack(spacing: 18) {
                         LineSample(style: style)
                             .frame(width: 200, height: 60)
                             .background(RoundedRectangle(cornerRadius: 10).fill(.background.secondary))
@@ -249,7 +249,7 @@ struct VertexExplorerView: View {
                     "QED has exactly **one** basic vertex: two fermion legs and one photon leg. Rotate it, and read it with time running left to right. Legs on the left are *incoming*; legs on the right are *outgoing*.",
                 ])
 
-                HStack(alignment: .top, spacing: 18) {
+                SidePanelStack(sideWidth: 300, spacing: 18) {
                     VStack(spacing: 10) {
                         DiagramCard {
                             ZStack(alignment: .top) {
@@ -261,7 +261,7 @@ struct VertexExplorerView: View {
                                 .padding(12)
                                 DiagramView(diagram: diagram, timeSlice: 0.5)
                             }
-                            .frame(height: 340)
+                            .adaptiveHeight(340, compact: 260)
                         }
                         HStack {
                             Image(systemName: "rotate.right")
@@ -269,7 +269,7 @@ struct VertexExplorerView: View {
                             Text("\(Int(angle))°").monospacedDigit().frame(width: 40)
                         }
                     }
-
+                } side: {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(story?.title ?? "—").font(.title2.bold())
                         HStack {
@@ -286,11 +286,11 @@ struct VertexExplorerView: View {
                             Button(s.title) {
                                 withAnimation(.easeInOut(duration: 0.6)) { angle = Self.presets[s.key] ?? angle }
                             }
-                            .buttonStyle(.link)
+                            .linkButtonStyle()
                         }
                     }
                     .padding(16)
-                    .frame(width: 300, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(RoundedRectangle(cornerRadius: 14).fill(.background.secondary))
                 }
 

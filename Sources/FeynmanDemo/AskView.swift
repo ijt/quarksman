@@ -28,10 +28,12 @@ final class AskModel {
 
     init() {
         load()
+        #if os(macOS)
         // Keep whatever has streamed so far if the app quits mid-answer.
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.save() }
         }
+        #endif
     }
 
     private func load() {
@@ -46,7 +48,7 @@ final class AskModel {
         }
     }
 
-    private func save() {
+    func save() {
         do {
             try FileManager.default.createDirectory(at: Self.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(conversations).write(to: Self.fileURL, options: .atomic)
@@ -149,6 +151,7 @@ struct AskView: View {
     let context: PageContext
     let model: AskModel
     @State private var draft = ""
+    @State private var showSettings = false
     @FocusState private var focused: Bool
 
     private var turns: [ChatTurn] { model.turns(for: context.title) }
@@ -162,6 +165,11 @@ struct AskView: View {
                         .font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 }
                 Spacer()
+                #if os(iOS)
+                Button { showSettings = true } label: { Image(systemName: "key") }
+                    .buttonStyle(.borderless)
+                    .help("API key")
+                #endif
                 Button { model.clear(page: context.title) } label: { Image(systemName: "trash") }
                     .buttonStyle(.borderless)
                     .help("Clear this page's conversation")
@@ -208,6 +216,13 @@ struct AskView: View {
             .padding(12)
         }
         .onAppear { focused = true }
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle("API key")
+                    .toolbar { Button("Done") { showSettings = false } }
+            }
+        }
     }
 
     private var emptyState: some View {
@@ -287,6 +302,8 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
+        #if os(macOS)
         .frame(width: 420)
+        #endif
     }
 }

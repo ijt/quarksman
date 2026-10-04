@@ -1,19 +1,28 @@
-import AppKit
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 @main
 struct FeynmanDemoApp: App {
+    #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    #endif
 
     var body: some Scene {
         WindowGroup("Feynman Diagrams") {
             ContentView()
+                #if os(macOS)
                 .frame(minWidth: 1050, minHeight: 700)
+                #endif
         }
+        #if os(macOS)
         Settings { SettingsView() }
+        #endif
     }
 }
 
+#if os(macOS)
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Needed when launched via `swift run` (no app bundle).
@@ -21,6 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 }
+#endif
 
 enum Page: Hashable {
     case intro, lines, vertex, orders, quiz
@@ -32,6 +42,7 @@ struct ContentView: View {
     @State private var context = PageContext.empty
     @State private var showAsk = false
     @State private var ask = AskModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationSplitView {
@@ -71,6 +82,8 @@ struct ContentView: View {
             }
         }
         .onPreferenceChange(PageContextKey.self) { context = $0 }
+        // iOS can kill a backgrounded app without warning, so save chats on the way out.
+        .onChange(of: scenePhase) { if scenePhase == .background { ask.save() } }
         .inspector(isPresented: $showAsk) {
             AskView(context: context, model: ask)
                 .inspectorColumnWidth(min: 300, ideal: 360, max: 520)

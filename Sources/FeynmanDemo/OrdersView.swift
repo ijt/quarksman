@@ -23,7 +23,7 @@ struct OrdersView: View {
                     .font(.system(size: 22, design: .serif))
                     .textSelection(.enabled)
 
-                HStack(alignment: .top, spacing: 16) {
+                AdaptiveStack {
                     miniDiagram(.moller, caption: "Tree level: 2 vertices, 𝓜 ∝ e²")
                     miniDiagram(.vacuumPolarization, caption: "One loop: 4 vertices, 𝓜 ∝ e⁴")
                 }

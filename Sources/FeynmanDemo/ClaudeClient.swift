@@ -16,7 +16,12 @@ struct ClaudeClient {
 
         var errorDescription: String? {
             switch self {
-            case .missingKey: return "No API key. Set ANTHROPIC_API_KEY or add a key in Settings (⌘,)."
+            case .missingKey:
+                #if os(macOS)
+                return "No API key. Set ANTHROPIC_API_KEY or add a key in Settings (⌘,)."
+                #else
+                return "No API key. Tap the key button above to add one."
+                #endif
             case .http(let code, let message): return "API error \(code): \(message)"
             case .stream(let message): return "Stream error: \(message)"
             case .refusal: return "Claude declined to answer this one."

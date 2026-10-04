@@ -58,7 +58,7 @@ struct QuizView: View {
                 }
 
                 DiagramCard {
-                    DiagramView(diagram: question.diagram, showLabels: !question.hideLabels).frame(height: 320)
+                    DiagramView(diagram: question.diagram, showLabels: !question.hideLabels).adaptiveHeight(320, compact: 240)
                 }
                 .frame(maxWidth: 760)
 

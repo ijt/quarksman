@@ -12,19 +12,18 @@ struct DiagramDetailView: View {
             VStack(alignment: .leading, spacing: 18) {
                 header
 
-                HStack(alignment: .top, spacing: 16) {
+                SidePanelStack(sideWidth: 290, sideMinHeight: 360) {
                     VStack(alignment: .leading, spacing: 10) {
                         DiagramCard {
                             DiagramView(diagram: diagram, timeSlice: showSlice ? time : nil,
                                         selection: selection, onSelect: { selection = $0 })
-                                .frame(height: 360)
+                                .adaptiveHeight(360, compact: 260)
                         }
                         timeControls
                         if showSlice { stateRow }
                     }
+                } side: {
                     SelectionInfoView(diagram: diagram, selection: selection)
-                        .frame(width: 290)
-                        .frame(minHeight: 360)
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -141,7 +140,7 @@ struct DiagramDetailView: View {
     private var stats: some View {
         let v = diagram.vertices.count
         let i = diagram.internalEdges.count
-        return HStack(spacing: 12) {
+        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
             stat("Vertices V", "\(v)", "amplitude ∝ g^\(v)")
             stat("Internal lines I", "\(i)", "virtual particles")
             stat("Loops L = I − V + 1", "\(diagram.loops)", diagram.loops == 0 ? "tree diagram" : "integrate over loop momentum")
