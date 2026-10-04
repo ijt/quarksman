@@ -23,11 +23,11 @@ You can also open `Package.swift` in Xcode and press Run.
 
 Requires iOS 17 or later. Tested with Xcode 27 and the iOS 27 simulator.
 
-1. Open `FeynmanDemo.xcodeproj` in Xcode.
-2. Pick the **FeynmanDiagrams-iOS** scheme and a simulator or your device.
+1. Open `Quarksman.xcodeproj` in Xcode.
+2. Pick the **Quarksman-iOS** scheme and a simulator or your device.
 3. Press Run.
 
-To run on your own device, select your team under **Signing & Capabilities**, and change the bundle ID (`com.issactrotts.FeynmanDiagrams` in `project.yml`) if Xcode says it's taken.
+To run on your own device, select your team under **Signing & Capabilities**, and change the bundle ID (`com.issactrotts.Quarksman` in `project.yml`) if Xcode says it's taken.
 
 If you don't have a simulator, install one from **Xcode → Settings → Components**, or run `xcodebuild -downloadPlatform iOS`.
 
@@ -50,10 +50,10 @@ Conversations are saved per page in `~/Library/Application Support/FeynmanDemo/c
 
 ## Project layout
 
-- `Sources/FeynmanDemo/`: all the app code, shared by both platforms.
+- `Sources/Quarksman/`: all the app code, shared by both platforms.
 - `Package.swift`: builds the macOS app with SwiftPM.
 - `Tools/MakeIcon.swift`: draws the app icon. Run `swift Tools/MakeIcon.swift` to regenerate both the iOS and macOS versions.
-- `project.yml`: generates `FeynmanDemo.xcodeproj` for iOS with [XcodeGen](https://github.com/yonaskolb/XcodeGen). After adding or removing source files, run:
+- `project.yml`: generates `Quarksman.xcodeproj` for iOS with [XcodeGen](https://github.com/yonaskolb/XcodeGen). After adding or removing source files, run:
 
   ```sh
   brew install xcodegen   # once

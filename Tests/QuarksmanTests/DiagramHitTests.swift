@@ -1,5 +1,5 @@
 import XCTest
-@testable import FeynmanDemo
+@testable import Quarksman
 
 final class DiagramHitTests: XCTestCase {
     /// Clicking the middle of each line selects that line, for every catalog diagram.

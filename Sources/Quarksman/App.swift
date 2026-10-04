@@ -4,7 +4,7 @@ import AppKit
 #endif
 
 @main
-struct FeynmanDemoApp: App {
+struct QuarksmanApp: App {
     #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     #endif

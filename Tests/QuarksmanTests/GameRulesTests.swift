@@ -1,5 +1,5 @@
 import XCTest
-@testable import FeynmanDemo
+@testable import Quarksman
 
 /// Builds boards for game levels and checks them against the rules.
 final class GameRulesTests: XCTestCase {

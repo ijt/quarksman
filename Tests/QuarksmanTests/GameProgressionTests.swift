@@ -1,5 +1,5 @@
 import XCTest
-@testable import FeynmanDemo
+@testable import Quarksman
 
 final class GameProgressionTests: XCTestCase {
     func testParticlesAreIntroducedGradually() {

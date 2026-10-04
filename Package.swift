@@ -2,10 +2,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "FeynmanDemo",
+    name: "Quarksman",
     platforms: [.macOS(.v14), .iOS(.v17)],
     targets: [
-        .executableTarget(name: "FeynmanDemo", path: "Sources/FeynmanDemo", resources: [.copy("Resources/AppIcon.png")]),
-        .testTarget(name: "FeynmanDemoTests", dependencies: ["FeynmanDemo"], path: "Tests/FeynmanDemoTests"),
+        .executableTarget(name: "Quarksman", path: "Sources/Quarksman", resources: [.copy("Resources/AppIcon.png")]),
+        .testTarget(name: "QuarksmanTests", dependencies: ["Quarksman"], path: "Tests/QuarksmanTests"),
     ]
 )
