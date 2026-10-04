@@ -104,7 +104,7 @@ extension Diagram {
         interaction: .weak,
         summary: "A down quark inside a neutron emits a virtual W⁻ and becomes an up quark, turning the neutron into a proton.",
         details: [
-            "Reading the quark lines top to bottom, the neutron (dud) becomes a proton (uud). The order is just how they're drawn; books usually write the neutron as udd. The virtual W⁻ carries away one unit of negative charge and decays to an electron and an electron antineutrino.",
+            "Reading the quark lines top to bottom, the neutron (ddu) becomes a proton (udu). The order is just how they're drawn; books usually write udd and uud. The virtual W⁻ carries away one unit of negative charge and decays to an electron and an electron antineutrino.",
             "The W is about 80,000 times heavier than the ~1 MeV of energy released. Its propagator 1/(q² − M²_W) ≈ −1/M²_W is therefore tiny. That's why the weak force is weak, and why a free neutron lives about 15 minutes.",
             "The other two quarks are **spectators**. They don't touch any vertex.",
             "The W vertex couples only to left-handed particles, through the factor (1 − γ⁵). This is where parity violation comes from.",
@@ -119,8 +119,8 @@ extension Diagram {
             Edge("v1", "v2", .wMinus),
             Edge("v2", "e", .electron),
             Edge("v2", "f", .antiNuE, labelSide: 1),
-            Edge("s1", "s2", .up),
-            Edge("s3", "s4", .down),
+            Edge("s1", "s2", .down),
+            Edge("s3", "s4", .up),
         ])
 
     static let quarkScattering = Diagram(
