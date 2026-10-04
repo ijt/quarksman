@@ -110,6 +110,14 @@ extension Diagram {
             "The W vertex couples only to left-handed particles, through the factor (1 − γ⁵). This is where parity violation comes from.",
         ],
         amplitude: "𝓜 ≈ (g² / 8M²_W) [ū_u γ^μ(1 − γ⁵) u_d] [ū_e γ_μ(1 − γ⁵) v_ν],   G_F/√2 = g²/8M²_W",
+        primer: Primer(
+            title: "New here: quarks",
+            paragraphs: [
+                "Protons and neutrons aren't elementary particles. Each is made of three **quarks**.",
+                "The two lightest are the **up** quark (u, charge +⅔) and the **down** quark (d, charge −⅓). A proton is uud: +⅔ + ⅔ − ⅓ = +1. A neutron is udd: +⅔ − ⅓ − ⅓ = 0.",
+                "Quarks are always bound inside particles like these, held together by gluons. Nobody has ever seen one on its own.",
+            ],
+            link: ("See how quarks are drawn in the cast of lines", .lines)),
         nodes: [.ext("a", 0.04, 0.55), .vtx("v1", 0.4, 0.55), .ext("c", 0.96, 0.55),
                 .vtx("v2", 0.66, 0.22), .ext("e", 0.96, 0.05), .ext("f", 0.96, 0.36),
                 .ext("s1", 0.04, 0.72), .ext("s2", 0.96, 0.72), .ext("s3", 0.04, 0.88), .ext("s4", 0.96, 0.88)],

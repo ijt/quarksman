@@ -2,6 +2,8 @@ import SwiftUI
 
 struct DiagramDetailView: View {
     let diagram: Diagram
+    /// Opens another page, for links in the primer.
+    var navigate: (Page) -> Void = { _ in }
     @State private var selection: DiagramSelection?
     @State private var time: CGFloat = 0.02
     @State private var showSlice = true
@@ -25,6 +27,8 @@ struct DiagramDetailView: View {
                 } side: {
                     SelectionInfoView(diagram: diagram, selection: selection)
                 }
+
+                if let primer = diagram.primer { primerBox(primer) }
 
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(diagram.details, id: \.self) { ProseText($0) }
@@ -67,6 +71,20 @@ struct DiagramDetailView: View {
         case .none: s.append("How would I compute a cross-section from this?")
         }
         return s
+    }
+
+    private func primerBox(_ primer: Primer) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(primer.title, systemImage: "lightbulb").font(.headline).foregroundStyle(Color.accentColor)
+            ForEach(primer.paragraphs, id: \.self) { ProseText($0) }
+            if let link = primer.link {
+                Button(link.title) { navigate(link.page) }.linkButtonStyle()
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: 760, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color.accentColor.opacity(0.08)))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.accentColor.opacity(0.3)))
     }
 
     private var header: some View {

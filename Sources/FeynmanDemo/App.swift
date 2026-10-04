@@ -91,7 +91,7 @@ struct ContentView: View {
                 case .orders: OrdersView()
                 case .quiz: QuizView()
                 case .game: GameView()
-                case .diagram(let id): DiagramDetailView(diagram: .named(id))
+                case .diagram(let id): DiagramDetailView(diagram: .named(id), navigate: { page = $0 })
                 }
             }
             .onPreferenceChange(FindBlocksKey.self) { find.blocks = $0 }

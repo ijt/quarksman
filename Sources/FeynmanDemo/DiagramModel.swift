@@ -78,12 +78,14 @@ struct Diagram: Identifiable {
     let summary: String
     let details: [String]
     let amplitude: String
+    /// Background a newcomer needs before the details, e.g. the first page that mentions quarks.
+    var primer: Primer?
     let nodes: [Node]
     let edges: [Edge]
     var aspect: CGFloat = 1.6
 
     init(id: String, title: String, process: String, interaction: Interaction, summary: String,
-         details: [String], amplitude: String, nodes: [Node], edges: [Edge], aspect: CGFloat = 1.6) {
+         details: [String], amplitude: String, primer: Primer? = nil, nodes: [Node], edges: [Edge], aspect: CGFloat = 1.6) {
         self.id = id
         self.title = title
         self.process = process
@@ -94,6 +96,7 @@ struct Diagram: Identifiable {
         self.nodes = nodes
         self.edges = edges.enumerated().map { i, e in var e = e; e.id = i; return e }
         self.aspect = aspect
+        self.primer = primer
     }
 
     func node(_ id: String) -> Node { nodes.first { $0.id == id }! }
@@ -118,4 +121,11 @@ struct Diagram: Identifiable {
             return g.minX < x && x < g.maxX
         }
     }
+}
+
+/// A short "New here" box shown above a diagram's details.
+struct Primer {
+    let title: String
+    let paragraphs: [String]
+    var link: (title: String, page: Page)?
 }

@@ -31,6 +31,7 @@ extension Diagram {
             "Time runs left to right. \(vertices.count) vertices, \(internalEdges.count) internal lines, \(loops) loop(s).",
             "Summary: \(summary)",
         ]
+        if let primer { lines.append("Primer box \"\(primer.title)\": " + primer.paragraphs.joined(separator: " ")) }
         lines += details.map { "• " + $0 }
         lines.append("Amplitude shown: \(amplitude)")
         lines.append("Lines:")
