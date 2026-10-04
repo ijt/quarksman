@@ -73,7 +73,7 @@ struct ContentView: View {
             .navigationSplitViewColumnWidth(min: 230, ideal: 260)
         } detail: {
             switch page ?? .intro {
-            case .intro: IntroView()
+            case .intro: IntroView(navigate: { page = $0 })
             case .lines: LinesView()
             case .vertex: VertexExplorerView()
             case .orders: OrdersView()

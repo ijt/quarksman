@@ -17,7 +17,17 @@ struct Section_: View {
 // MARK: - Intro
 
 struct IntroView: View {
+    /// Opens another page, for the "Where to go next" links.
+    var navigate: (Page) -> Void = { _ in }
     @State private var time: CGFloat = 0.1
+
+    private let nextSteps: [(page: Page, title: String, detail: String)] = [
+        (.lines, "The cast of lines", "The visual vocabulary."),
+        (.vertex, "One vertex, six stories", "Rotate a single vertex to see emission, absorption, pair creation and annihilation."),
+        (.diagram(Diagram.catalog[0].id), "Processes", "Ten real processes. Click lines to inspect them and sweep the time slice."),
+        (.orders, "Orders & loops", "Why perturbation theory works for QED but not for low-energy QCD."),
+        (.quiz, "Quiz", "Test yourself."),
+    ]
 
     var body: some View {
         ScrollView {
@@ -57,13 +67,18 @@ struct IntroView: View {
                     "You can therefore start with the simplest diagrams (**tree level**) and add **loop** corrections for more precision. Each loop typically costs a factor of about α/π ≈ 0.002.",
                 ])
 
-                Section_("Where to go next", [
-                    "• **The cast of lines** — the visual vocabulary.",
-                    "• **One vertex, six stories** — rotate a single vertex to see emission, absorption, pair creation and annihilation.",
-                    "• **Processes** — ten real processes. Click lines to inspect them and sweep the time slice.",
-                    "• **Orders & loops** — why perturbation theory works for QED but not for low-energy QCD.",
-                    "• **Quiz** — test yourself.",
-                ])
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Where to go next").font(.title2.bold())
+                    ForEach(nextSteps, id: \.title) { step in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Button(step.title) { navigate(step.page) }
+                                .linkButtonStyle()
+                                .font(.headline)
+                            Text(step.detail).font(.callout).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .frame(maxWidth: 760, alignment: .leading)
             }
             .padding(28)
         }
