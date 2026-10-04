@@ -10,6 +10,7 @@ struct FeynmanDemoApp: App {
             ContentView()
                 .frame(minWidth: 1050, minHeight: 700)
         }
+        Settings { SettingsView() }
     }
 }
 
@@ -28,6 +29,9 @@ enum Page: Hashable {
 
 struct ContentView: View {
     @State private var page: Page? = .intro
+    @State private var context = PageContext.empty
+    @State private var showAsk = false
+    @State private var ask = AskModel()
 
     var body: some View {
         NavigationSplitView {
@@ -64,6 +68,18 @@ struct ContentView: View {
             case .orders: OrdersView()
             case .quiz: QuizView()
             case .diagram(let id): DiagramDetailView(diagram: .named(id))
+            }
+        }
+        .onPreferenceChange(PageContextKey.self) { context = $0 }
+        .inspector(isPresented: $showAsk) {
+            AskView(context: context, model: ask)
+                .inspectorColumnWidth(min: 300, ideal: 360, max: 520)
+        }
+        .toolbar {
+            ToolbarItem {
+                Button { showAsk.toggle() } label: { Label("Ask Claude", systemImage: "sparkles") }
+                    .keyboardShortcut("k", modifiers: .command)
+                    .help("Ask Claude about this page (⌘K)")
             }
         }
     }
