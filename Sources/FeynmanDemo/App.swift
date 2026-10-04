@@ -42,7 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
 enum Page: Hashable {
-    case intro, lines, vertex, orders, quiz
+    case intro, lines, vertex, orders, quiz, game
     case diagram(String)
 }
 
@@ -78,6 +78,7 @@ struct ContentView: View {
                 Section("Go deeper") {
                     Label("Orders & loops", systemImage: "chart.bar.xaxis").tag(Page.orders)
                     Label("Quiz", systemImage: "questionmark.circle").tag(Page.quiz)
+                    Label("Diagram Builder", systemImage: "puzzlepiece.extension").tag(Page.game)
                 }
             }
             .navigationSplitViewColumnWidth(min: 230, ideal: 260)
@@ -89,6 +90,7 @@ struct ContentView: View {
                 case .vertex: VertexExplorerView()
                 case .orders: OrdersView()
                 case .quiz: QuizView()
+                case .game: GameView()
                 case .diagram(let id): DiagramDetailView(diagram: .named(id))
                 }
             }
