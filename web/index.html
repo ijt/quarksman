@@ -1771,7 +1771,10 @@ const Ask = (() => {
   const app = document.getElementById("app"), panel = document.getElementById("ask"), toggle = document.getElementById("ask-toggle");
   const log = document.getElementById("ask-log"), chips = document.getElementById("ask-chips"), about = document.getElementById("ask-about");
   const form = document.getElementById("ask-form"), box = document.getElementById("ask-text"), sendBtn = document.getElementById("ask-send");
-  const convos = new Map();
+  // Chats are kept per page in this browser, so they survive a reload.
+  const convos = new Map(Object.entries(store.get("chats", {})).map(([page, turns]) => [page, turns.map(t =>
+    t.role === "assistant" && !t.text ? { ...t, pending: false, error: true, text: "Stopped before Claude answered." } : { ...t, pending: false })]));
+  const saveChats = () => store.set("chats", Object.fromEntries(convos));
   let sample = null, ctl = null, busy = false, disabled = null, lastKey = "";
 
   const RULES = `You are a friendly physics tutor inside Quarksman, an interactive app that teaches Feynman diagrams. Each question arrives with a description of the page the student is looking at, inside <page> tags; it reflects what's on screen right now (selected lines, time slider, quiz state). Ground your answer in that page.
@@ -1793,7 +1796,7 @@ Pitch answers at a curious undergraduate unless the student asks for more or les
   }
   toggle.onclick = () => setOpen(panel.hidden);
   document.getElementById("ask-close").onclick = () => { setOpen(false); toggle.focus(); };
-  document.getElementById("ask-clear").onclick = () => { ctl?.abort(); convos.set(ctx().title, []); render(); };
+  document.getElementById("ask-clear").onclick = () => { ctl?.abort(); convos.set(ctx().title, []); saveChats(); render(); };
   document.addEventListener("keydown", e => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k" && sample) { e.preventDefault(); setOpen(panel.hidden); }
     if (e.key === "Escape" && !panel.hidden && matchMedia("(max-width: 880px)").matches) setOpen(false);
@@ -1843,7 +1846,7 @@ Pitch answers at a curious undergraduate unless the student asks for more or les
         if (reply.text) reply.note = msg; else { reply.text = msg; reply.error = true; }
       }
     } finally {
-      reply.pending = false; busy = false; ctl = null; render();
+      reply.pending = false; busy = false; ctl = null; saveChats(); render();
     }
   }
 
