@@ -216,6 +216,44 @@ svg.diagram { display: block; width: 100%; height: auto; touch-action: pan-y; us
 .feedback .verdict.ok { color: var(--good); }
 .feedback .verdict.no { color: var(--warn); }
 
+/* Diagram Builder Game */
+.game-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.game-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.board-plate { max-width: 900px; }
+svg.board { touch-action: none; cursor: crosshair; }
+.board .board-hint { font: 14px var(--body); fill: var(--muted); text-anchor: middle; }
+.board .leg-label { font: 600 20px var(--display); text-anchor: middle; }
+.board .problem { fill: none; stroke: var(--bad); stroke-opacity: .4; stroke-width: 13; stroke-linecap: round; }
+.board .problem-ring { fill: none; stroke: var(--bad); stroke-opacity: .7; stroke-width: 3; }
+.board .problem-dot { fill: var(--bad); opacity: .35; }
+.board .sel-dot { fill: var(--accent); opacity: .35; }
+.board .rubber { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; }
+.board .now-line { stroke: var(--accent); stroke-opacity: .6; stroke-width: 1.5; stroke-dasharray: 4 4; }
+.palette { display: flex; gap: 8px; flex-wrap: wrap; }
+.pal { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--rule); background: var(--surface); cursor: pointer; font-size: 17px; }
+.pal.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+.pal-line { width: 56px; display: block; }
+.newcard { border: 1px solid color-mix(in srgb, #E8B931 50%, transparent); background: color-mix(in srgb, #E8B931 10%, var(--surface)); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; max-width: 900px; }
+.newcard h3 { font: 600 16px var(--body); color: #C99A0E; }
+.newcard .btn { justify-self: start; }
+.newrow { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 12px; align-items: start; }
+.result { border-radius: 12px; padding: 14px 16px; display: grid; gap: 8px; max-width: 900px; }
+.result.ok { background: color-mix(in srgb, var(--good) 13%, var(--surface)); }
+.result.warn { background: color-mix(in srgb, var(--warn) 12%, var(--surface)); }
+.result .btn { justify-self: start; }
+.stars { color: #E8B931; font-size: 22px; letter-spacing: 2px; }
+.notice { color: var(--warn); }
+.howto { max-width: 70ch; font-size: 14px; }
+.howto summary { cursor: pointer; font-weight: 600; }
+.howto p { margin-top: 4px; }
+.zoo-overlay { position: fixed; inset: 0; background: rgb(0 0 0 / .45); display: grid; place-items: center; padding: 16px; z-index: 30; }
+.zoo { background: var(--surface); border-radius: 14px; width: min(760px, 100%); max-height: 85dvh; overflow: auto; padding: 18px; display: grid; gap: 14px; }
+.zoo-head { display: flex; justify-content: space-between; align-items: center; }
+.zoo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.zoo-card { border: 1px solid var(--rule); border-radius: 12px; padding: 12px; display: grid; gap: 6px; align-content: start; }
+.zoo-card.locked { opacity: .7; min-height: 110px; }
+.zoo-card .q { font-size: 28px; color: var(--muted); text-align: center; }
+
 /* Ask drawer */
 .ask { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; border-left: 1px solid var(--rule); background: var(--surface); min-width: 0; }
 .ask-head { display: flex; justify-content: space-between; align-items: start; gap: 10px; padding: 16px; border-bottom: 1px solid var(--rule); }
@@ -1197,6 +1235,537 @@ function quizPage() {
   }) };
 }
 
+/* ---------- Diagram Builder Game ---------- */
+const SPECIES = {
+  e: { name: "electron", sym: ["e⁻", "e⁺"], virt: "e*", style: "fermion", charge: -1, partner: "nuE", mass: "0.511 MeV",
+    fact: "The lightest charged particle, and stable. All of chemistry is electrons rearranging." },
+  mu: { name: "muon", sym: ["μ⁻", "μ⁺"], virt: "μ*", style: "fermion", charge: -1, partner: "nuMu", mass: "105.7 MeV",
+    fact: "A 207× heavier electron. Muons from cosmic rays rain through you all day, living just long enough to reach the ground." },
+  nuE: { name: "electron neutrino", sym: ["νₑ", "ν̄ₑ"], virt: "νₑ*", style: "fermion", charge: 0, partner: "e", neutrino: true, mass: "under 1 eV",
+    fact: "Feels only the weak force. Trillions from the Sun pass through your body every second." },
+  nuMu: { name: "muon neutrino", sym: ["νμ", "ν̄μ"], virt: "νμ*", style: "fermion", charge: 0, partner: "mu", neutrino: true, mass: "under 1 eV",
+    fact: "The muon's partner. A different neutrino from the electron's, as its 1962 discovery showed." },
+  u: { name: "up quark", sym: ["u", "ū"], virt: "u*", style: "fermion", charge: 2 / 3, partner: "d", colored: true, mass: "≈2.2 MeV",
+    fact: "The lightest quark, with charge +⅔. A proton is two ups and a down." },
+  d: { name: "down quark", sym: ["d", "d̄"], virt: "d*", style: "fermion", charge: -1 / 3, partner: "u", colored: true, mass: "≈4.7 MeV",
+    fact: "Charge −⅓. Slightly heavier than the up, which is why free neutrons decay." },
+  t: { name: "top quark", sym: ["t", "t̄"], virt: "t*", style: "fermion", charge: 2 / 3, colored: true, mass: "≈172.6 GeV",
+    fact: "The heaviest known elementary particle, about as heavy as a gold atom. It decays before it can form hadrons." },
+  photon: { name: "photon", sym: ["γ"], virt: "γ*", style: "photon", charge: 0, mass: "0",
+    fact: "Carries the electromagnetic force. Massless and neutral, so photons don't interact with each other." },
+  gluon: { name: "gluon", sym: ["g"], virt: "g*", style: "gluon", charge: 0, mass: "0",
+    fact: "Carries the strong force and has color charge of its own, so gluons stick to each other." },
+  w: { name: "W boson", sym: ["W"], virt: "W*", style: "weak", charge: 0, chargeLabel: "±1", mass: "80.4 GeV",
+    fact: "Carries the weak force and changes flavor. Its large mass is why the weak force seems weak." },
+  higgs: { name: "Higgs", sym: ["H"], virt: "H*", style: "higgs", charge: 0, mass: "125.1 GeV",
+    fact: "The excitation of the field that gives particles mass. Found at the LHC in 2012." },
+};
+const SPECIES_ORDER = Object.keys(SPECIES);
+const isFermion = s => SPECIES[s].style === "fermion";
+const symbolOf = (s, anti = false) => SPECIES[s].sym[anti && SPECIES[s].sym.length > 1 ? 1 : 0];
+const aName = s => (["electron", "electron neutrino", "up quark"].includes(SPECIES[s].name) ? "an " : "a ") + SPECIES[s].name;
+const capitalize = t => t[0].toUpperCase() + t.slice(1);
+function chargeText(q) {
+  const thirds = Math.round(q * 3);
+  return { 0: "0", 3: "+1", "-3": "−1", 2: "+⅔", "-2": "−⅔", 1: "+⅓", "-1": "−⅓" }[thirds] ?? `${thirds > 0 ? "+" : "−"}${Math.abs(thirds)}/3`;
+}
+const chargeLabel = s => SPECIES[s].chargeLabel ?? chargeText(SPECIES[s].charge);
+
+const into = (s, anti = false) => ({ s, anti, incoming: true });
+const out = (s, anti = false) => ({ s, anti, incoming: false });
+const legSymbol = l => symbolOf(l.s, l.anti);
+const arrowIntoDiagram = l => l.incoming !== l.anti;
+
+const LEVELS = [
+  { id: "repel", title: "Repel", goal: "Two electrons come in and two go out. Make them scatter off each other.",
+    legs: [into("e"), into("e"), out("e"), out("e")], palette: ["photon"], par: 2,
+    hint: "Each electron needs its own vertex. What could carry momentum from one to the other?",
+    lesson: "That's Møller scattering: the electrons trade a virtual photon. There's also a crossed version with the outgoing electrons swapped, and the two amplitudes are added." },
+  { id: "annihilate", title: "Annihilate", goal: "An electron and a positron go in; a muon and an antimuon come out.",
+    legs: [into("e"), into("e", true), out("mu"), out("mu", true)], palette: ["photon"], par: 2,
+    hint: "Fermion arrows can't stop at a vertex: the electron's arrow has to leave again along the positron line.",
+    lesson: "Annihilation in the s-channel. The virtual photon carries all of the collision energy, so it's far off its mass shell." },
+  { id: "compton", title: "Bounce light", goal: "A photon scatters off an electron.",
+    legs: [into("e"), into("photon"), out("e"), out("photon")], palette: ["photon", "e"], par: 2,
+    hint: "The electron absorbs one photon and emits the other. In between, it's a virtual electron.",
+    lesson: "Compton scattering. There are two orderings, absorb-then-emit and emit-then-absorb, and you need both for the right answer." },
+  { id: "pair", title: "Light into matter", goal: "Two photons collide and make an electron–positron pair.",
+    legs: [into("photon"), into("photon"), out("e"), out("e", true)], palette: ["photon", "e"], par: 2,
+    hint: "Each photon must attach to a charged line. Run one fermion line from the e⁺ back through both vertices to the e⁻.",
+    lesson: "The Breit–Wheeler process: light turning into matter. It's pair annihilation run backward in time." },
+  { id: "muon", title: "Muon decay", goal: "A muon decays into a muon neutrino, an electron and an electron antineutrino.",
+    legs: [into("mu"), out("nuMu"), out("e"), out("nuE", true)], palette: ["photon", "w"], par: 2,
+    hint: "Photons never change flavor. Which boson turns a muon into its neutrino?",
+    lesson: "The W turns μ⁻ into νμ, then becomes e⁻ and ν̄ₑ. The W is so heavy that this takes a leisurely 2.2 μs, ages by particle standards." },
+  { id: "beta", title: "Beta decay", goal: "A down quark (inside a neutron) becomes an up quark, an electron and an antineutrino.",
+    legs: [into("d"), out("u"), out("e"), out("nuE", true)], palette: ["photon", "w"], par: 2,
+    hint: "Same idea as muon decay, but the W attaches to quarks at one end.",
+    lesson: "Neutron β decay at the quark level: udd → uud. Check the charge at the quark vertex: −⅓ = +⅔ + (−1)." },
+  { id: "strong", title: "Quark scattering", goal: "An up quark and a down quark scatter.",
+    legs: [into("u"), into("d"), out("u"), out("d")], palette: ["photon", "gluon"], par: 2,
+    hint: "Quarks feel the strong force. Exchange something between them.",
+    lesson: "Both a photon and a gluon work. The gluon wins by far, because α_s ≈ 0.1–1 while α ≈ 1/137." },
+  { id: "glue", title: "Glue on glue", goal: "Two gluons scatter into two gluons, with no quarks at all.",
+    legs: [into("gluon"), into("gluon"), out("gluon"), out("gluon")], palette: ["gluon", "photon"], par: 2,
+    hint: "Gluons carry color, so they can meet other gluons at a vertex.",
+    lesson: "Only possible because gluons interact with each other. Swap the gluons for photons and there's no tree-level diagram: light-by-light scattering needs a loop of charged particles." },
+  { id: "higgs", title: "Higgs to photons", goal: "A Higgs boson decays into two photons.",
+    legs: [into("higgs"), out("photon"), out("photon")], palette: ["photon", "t"], par: 3,
+    hint: "The Higgs never touches photons directly. It does couple to heavy charged particles, and so do photons.",
+    lesson: "You built a loop! Only about 0.2% of Higgs bosons decay this way, but it was one of the two channels in which the Higgs was discovered in 2012." },
+  { id: "lfv", title: "Trick question", goal: "Can a muon decay into just an electron and a photon? Build it, or press \"It can't happen\".",
+    legs: [into("mu"), out("e"), out("photon")], palette: ["photon", "w", "e", "mu", "nuE", "nuMu"], par: null,
+    hint: "Look at what each vertex is allowed to do to a particle's flavor.",
+    lesson: "Correct: it can't happen. Photons never change flavor, and the W always pairs a lepton with its own neutrino. (Tiny neutrino masses do allow it at about 10⁻⁵⁴, far beyond any experiment. Seeing it would mean new physics.)" },
+  { id: "family", title: "Family business", goal: "Two electrons collide. Can two muons come out?",
+    legs: [into("e"), into("e"), out("mu"), out("mu")], palette: ["photon", "w", "e", "mu", "nuE", "nuMu"], par: null,
+    hint: "Count electrons and muons on each side.",
+    lesson: "Correct: electron number and muon number are each conserved, so two electrons can't become two muons. (An electron and a positron can, because together they have zero electron number.)" },
+];
+const levelSpecies = l => new Set([...l.palette, ...l.legs.map(g => g.s)]);
+const processText = l => `${l.legs.filter(g => g.incoming).map(legSymbol).join(" ")} → ${l.legs.filter(g => !g.incoming).map(legSymbol).join(" ")}`;
+/** Particles that appear for the first time in level `i`. */
+function introducedAt(i) {
+  const earlier = new Set(LEVELS.slice(0, i).flatMap(l => [...levelSpecies(l)]));
+  return SPECIES_ORDER.filter(s => levelSpecies(LEVELS[i]).has(s) && !earlier.has(s));
+}
+const firstLevelFor = s => LEVELS.findIndex(l => levelSpecies(l).has(s));
+
+// Board: externals sit at the edges; a line to an external has the external as `a`; an internal fermion's arrow runs a → b.
+function newBoard(level) {
+  const b = { nodes: [], edges: [], next: 0 };
+  const ins = level.legs.map((l, i) => i).filter(i => level.legs[i].incoming), outs = level.legs.map((l, i) => i).filter(i => !level.legs[i].incoming);
+  ins.forEach((i, k) => addNode(b, 0.05, (k + 1) / (ins.length + 1), i));
+  outs.forEach((i, k) => addNode(b, 0.95, (k + 1) / (outs.length + 1), i));
+  return b;
+}
+function addNode(b, x, y, leg = null) { const id = b.next++; b.nodes.push({ id, x, y, leg }); return id; }
+const nodeOf = (b, id) => b.nodes.find(n => n.id === id);
+const isVertex = n => n && n.leg === null;
+const edgesAt = (b, id) => b.edges.filter(e => e.a === id || e.b === id);
+const boardVertices = b => b.nodes.filter(isVertex);
+const internalEdges = b => b.edges.filter(e => isVertex(nodeOf(b, e.a)) && isVertex(nodeOf(b, e.b)));
+
+function connect(b, p, q, species, level) {
+  const np = nodeOf(b, p), nq = nodeOf(b, q);
+  if (p === q || !np || !nq) return null;
+  if (!isVertex(np) && !isVertex(nq)) return "Particles meet only at vertices. Connect each one to a vertex.";
+  for (const n of [np, nq]) {
+    if (isVertex(n) && edgesAt(b, n.id).length >= 3) return "A vertex joins exactly three lines, and this one already has three.";
+    if (!isVertex(n) && edgesAt(b, n.id).length) return `${legSymbol(level.legs[n.leg])} is already connected.`;
+  }
+  const leg = np.leg ?? nq.leg;
+  if (leg !== null && leg !== undefined) {
+    const external = isVertex(np) ? q : p, vertex = isVertex(np) ? p : q;
+    b.edges.push({ id: b.next++, a: external, b: vertex, s: level.legs[leg].s });
+  } else {
+    b.edges.push({ id: b.next++, a: p, b: q, s: species });
+  }
+  return null;
+}
+
+function arrowIn(b, e, v, level) {
+  const na = nodeOf(b, e.a);
+  return isVertex(na) ? e.b === v : arrowIntoDiagram(level.legs[na.leg]);
+}
+
+/** Checks a board against the rules. Mirrors GameRules.check in the app. */
+function checkBoard(b, level) {
+  const problems = [];
+  for (const n of b.nodes) if (!isVertex(n) && !edgesAt(b, n.id).length)
+    problems.push({ message: `${legSymbol(level.legs[n.leg])} isn't connected to anything yet.`, nodes: [n.id], edges: [] });
+  const wOutflow = {};
+  for (const v of boardVertices(b)) {
+    const legs = edgesAt(b, v.id);
+    const bad = message => problems.push({ message, nodes: [v.id], edges: legs.map(e => e.id) });
+    if (legs.length !== 3) { problems.push({ message: `This vertex has ${legs.length} line${legs.length === 1 ? "" : "s"}. Every vertex needs exactly three.`, nodes: [v.id], edges: [] }); continue; }
+    const fermions = legs.filter(e => isFermion(e.s)), bosons = legs.filter(e => !isFermion(e.s));
+    const names = legs.map(e => symbolOf(e.s)).join(", ");
+    if (!fermions.length) {
+      if (bosons.every(e => e.s === "gluon")) continue;
+      bad(bosons.every(e => e.s === "photon") ? "Photons have no charge, so no vertex joins photons to each other." : `This game has no vertex joining ${names}.`);
+      continue;
+    }
+    if (fermions.length !== 2 || bosons.length !== 1) {
+      bad(fermions.length === 1 || fermions.length === 3
+        ? "A fermion line can't start or end at a vertex: each vertex needs fermion lines in pairs, one in and one out."
+        : `This game has no vertex joining ${names}.`);
+      continue;
+    }
+    const ins = fermions.filter(e => arrowIn(b, e, v.id, level));
+    if (ins.length !== 1) {
+      bad(`Both fermion arrows point ${ins.length === 2 ? "into" : "out of"} this vertex. One must come in and one must go out. Select an internal line and flip its arrow.`);
+      continue;
+    }
+    const fin = ins[0].s, fout = fermions.find(e => !arrowIn(b, e, v.id, level)).s, boson = bosons[0];
+    if (boson.s === "photon") {
+      if (fin !== fout) bad(`A photon can't change ${aName(fin)} into ${aName(fout)}. Only the W changes flavor.`);
+      else if (SPECIES[fin].neutrino) bad("Neutrinos have no electric charge, so they don't couple to photons.");
+    } else if (boson.s === "gluon") {
+      if (fin !== fout) bad(`A gluon can't change ${aName(fin)} into ${aName(fout)}.`);
+      else if (!SPECIES[fin].colored) bad(`Gluons couple only to quarks (color charge). ${capitalize(aName(fin))} has no color.`);
+    } else if (boson.s === "higgs") {
+      if (fin !== fout) bad(`The Higgs can't change ${aName(fin)} into ${aName(fout)}.`);
+      else if (SPECIES[fin].neutrino) bad("In this game neutrinos are massless, so they don't couple to the Higgs.");
+    } else if (boson.s === "w") {
+      if (SPECIES[fin].partner !== fout) bad(`The W only connects weak partners (e↔νₑ, μ↔νμ, u↔d). It can't turn ${aName(fin)} into ${aName(fout)}.`);
+      else if (isVertex(nodeOf(b, boson.a)) && isVertex(nodeOf(b, boson.b))) wOutflow[v.id] = SPECIES[fin].charge - SPECIES[fout].charge;
+    } else bad(`This game has no vertex joining ${names}.`);
+  }
+  for (const e of internalEdges(b)) {
+    if (e.s !== "w") continue;
+    const qa = wOutflow[e.a], qb = wOutflow[e.b];
+    if (qa !== undefined && qb !== undefined && Math.abs(qa + qb) > 0.01)
+      problems.push({ message: `Charge isn't conserved along this W: one end sends out charge ${chargeText(qa)}, the other sends out ${chargeText(qb)}. They have to cancel.`, nodes: [e.a, e.b], edges: [e.id] });
+  }
+  // Everything must be one connected diagram.
+  const parent = Object.fromEntries(b.nodes.map(n => [n.id, n.id]));
+  const find = x => { while (parent[x] !== x) x = parent[x]; return x; };
+  for (const e of b.edges) parent[find(e.a)] = find(e.b);
+  if (new Set(b.nodes.map(n => find(n.id))).size > 1 && !problems.length)
+    problems.push({ message: "The diagram is in separate pieces. Everything has to connect into one diagram.", nodes: [], edges: [] });
+  const v = boardVertices(b).length;
+  return { problems, valid: !problems.length, vertexCount: v, loops: Math.max(0, internalEdges(b).length - v + 1) };
+}
+const starsFor = (c, level) => !c.valid || level.par === null ? 0 : c.vertexCount <= level.par ? 3 : c.vertexCount <= level.par + 2 ? 2 : 1;
+
+// Progress lives in this browser only: a per-viewer convenience.
+const store = {
+  get(key, fallback) { try { return JSON.parse(localStorage.getItem("quarksman." + key)) ?? fallback; } catch { return fallback; } },
+  set(key, value) { try { localStorage.setItem("quarksman." + key, JSON.stringify(value)); } catch {} },
+};
+
+function gamePage() {
+  let stars = store.get("stars", {}), seen = new Set(store.get("seen", []));
+  const isUnlocked = i => i === 0 || (stars[LEVELS[i - 1].id] ?? 0) > 0;
+  let index = LEVELS.findIndex(l => stars[l.id] === undefined); if (index < 0) index = LEVELS.length - 1;
+  let level, board, history, species, selection, check, notice, wrongGuess, celebration = null;
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function go(i) {
+    if (!isUnlocked(i)) return;
+    index = i; level = LEVELS[i]; board = newBoard(level); history = []; species = level.palette[0];
+    selection = null; check = null; notice = null; wrongGuess = false; stopCelebration();
+    render();
+  }
+  function change(fn) {
+    const next = structuredClone(board);
+    const reason = fn(next);
+    if (reason) { notice = reason; render(); return; }
+    if (JSON.stringify(next) === JSON.stringify(board)) return;
+    history.push(board); board = next; check = null; notice = null; wrongGuess = false; stopCelebration();
+    render();
+  }
+  function record(earned) { stars[level.id] = Math.max(earned, stars[level.id] ?? 0); store.set("stars", stars); }
+
+  const root = el(`<article class="page game">
+    <header class="game-head">
+      <span class="eyebrow" data-slot="count"></span>
+      <div class="game-tools">
+        <button class="btn small" data-slot="zoo-btn"></button>
+        <select class="btn small" data-slot="levels" aria-label="Choose a level"></select>
+      </div>
+    </header>
+    <div class="prose" style="max-width:none;gap:4px">
+      <h1 data-slot="title" style="font-size:30px"></h1>
+      <p class="math" data-slot="process" style="font-size:26px"></p>
+      <p class="muted" data-slot="goal"></p>
+    </div>
+    <div data-slot="intro"></div>
+    <div class="plate board-plate"></div>
+    <div class="palette-wrap"><p class="small muted" data-slot="palette-label"></p><div class="palette"></div></div>
+    <div class="controls" data-slot="controls"></div>
+    <div data-slot="feedback"></div>
+    <details class="howto"><summary>How to play</summary>
+      <p>• <strong>Click</strong> empty space to add a vertex.</p>
+      <p>• <strong>Drag</strong> from one dot to another to draw a line. Drag from a dot into empty space to add a new vertex already connected to it.</p>
+      <p>• Lines to the particles at the edges take that particle automatically. Lines between two vertices use the particle chosen below the board.</p>
+      <p>• <strong>Click a line</strong> to select it: flip its arrow, delete it, or pick a new particle for it. Click a vertex to select and delete it.</p>
+      <p>• A fermion's arrow on an internal line points the way you drew it.</p>
+      <p>• Press <strong>Check</strong> when you're done. Fewer vertices earns more stars.</p>
+    </details>
+  </article>`);
+  const slot = n => root.querySelector(`[data-slot="${n}"]`);
+
+  // Board geometry: the frame is 748 × 467.5 inside an 800-wide viewBox.
+  const FX = 26, FY = 26, FW = 748, FH = FW / 1.6, VW = 800, VH = FY + FH + 40;
+  const svg = d3.create("svg").attr("class", "diagram board").attr("viewBox", `0 0 ${VW} ${VH}`).attr("role", "application")
+    .attr("aria-label", "Diagram board");
+  root.querySelector(".board-plate").append(svg.node());
+  const pt = n => [FX + n.x * FW, FY + n.y * FH];
+  const toUnit = ([x, y]) => [clamp((x - FX) / FW, 0.1, 0.9), clamp((y - FY) / FH, 0.03, 0.97)];
+  function geom(e) {
+    const na = nodeOf(board, e.a), nb = nodeOf(board, e.b);
+    const sib = board.edges.filter(f => (f.a === e.a && f.b === e.b) || (f.a === e.b && f.b === e.a)).sort((x, y) => x.id - y.id);
+    let bend = 0;
+    if (sib.length > 1) { bend = (sib.findIndex(f => f.id === e.id) - (sib.length - 1) / 2) * 0.5; if (e.a > e.b) bend = -bend; }
+    return sampleEdge(pt(na), pt(nb), bend);
+  }
+  const nodeHit = p => {
+    let best = null, bd = 22;
+    for (const n of board.nodes) { const [x, y] = pt(n), d = Math.hypot(x - p[0], y - p[1]); if (d < bd) { bd = d; best = n.id; } }
+    return best;
+  };
+  const edgeHit = p => {
+    let best = null, bd = 12;
+    for (const e of board.edges) {
+      const g = geom(e);
+      for (let i = 1; i < g.pts.length; i++) {
+        const [ax, ay] = g.pts[i - 1], [bx, by] = g.pts[i], dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+        const t = l2 ? clamp(((p[0] - ax) * dx + (p[1] - ay) * dy) / l2, 0, 1) : 0;
+        const d = Math.hypot(p[0] - (ax + dx * t), p[1] - (ay + dy * t));
+        if (d < bd) { bd = d; best = e.id; }
+      }
+    }
+    return best;
+  };
+  const svgPoint = ev => { const m = svg.node().getScreenCTM().inverse(), q = new DOMPoint(ev.clientX, ev.clientY).matrixTransform(m); return [q.x, q.y]; };
+
+  // Pointer handling: a short press is a click, a longer move is a drag between dots.
+  let press = null, rubber = null;
+  svg.on("pointerdown", ev => { press = { start: svgPoint(ev), from: nodeHit(svgPoint(ev)), moved: false }; svg.node().setPointerCapture(ev.pointerId); });
+  svg.on("pointermove", ev => {
+    if (!press) return;
+    const p = svgPoint(ev);
+    if (Math.hypot(p[0] - press.start[0], p[1] - press.start[1]) > 6) press.moved = true;
+    if (press.moved && press.from !== null) { rubber = [pt(nodeOf(board, press.from)), p]; drawBoard(); }
+  });
+  svg.on("pointerup", ev => {
+    if (!press) return;
+    const p = svgPoint(ev), { from, moved } = press;
+    press = null; rubber = null;
+    if (!moved) return clickAt(p);
+    if (from === null) return drawBoard();
+    const to = nodeHit(p);
+    if (to !== null && to !== from) change(b => connect(b, from, to, species, level));
+    else if (p[0] > FX - 4 && p[0] < FX + FW + 4 && p[1] > FY - 4 && p[1] < FY + FH + 4) {
+      const [ux, uy] = toUnit(p);
+      change(b => connect(b, from, addNode(b, ux, uy), species, level));
+    } else drawBoard();
+  });
+  function clickAt(p) {
+    const n = nodeHit(p);
+    if (n !== null) { selection = isVertex(nodeOf(board, n)) ? { node: n } : null; return render(); }
+    const e = edgeHit(p);
+    if (e !== null) { selection = { edge: e }; return render(); }
+    if (selection) { selection = null; return render(); }
+    if (p[0] > FX - 4 && p[0] < FX + FW + 4 && p[1] > FY - 4 && p[1] < FY + FH + 4) { const [ux, uy] = toUnit(p); change(b => { addNode(b, ux, uy); return null; }); }
+  }
+
+  function drawBoard() {
+    svg.selectChildren().remove();
+    const problemNodes = new Set(check?.problems.flatMap(p => p.nodes) ?? []), problemEdges = new Set(check?.problems.flatMap(p => p.edges) ?? []);
+    const ax = svg.append("g").attr("class", "axis"), ay = FY + FH + 22;
+    ax.append("line").attr("x1", VW / 2 - 50).attr("x2", VW / 2 + 30).attr("y1", ay).attr("y2", ay);
+    ax.append("path").attr("d", `M${VW / 2 + 23},${ay - 5}L${VW / 2 + 30},${ay}L${VW / 2 + 23},${ay + 5}`);
+    ax.append("text").attr("x", VW / 2 + 38).attr("y", ay).attr("dominant-baseline", "central").text("time");
+    if (!boardVertices(board).length) {
+      svg.append("text").attr("class", "board-hint").attr("x", VW / 2).attr("y", FY + FH / 2 - 12).text("Click to add a vertex");
+      svg.append("text").attr("class", "board-hint").attr("x", VW / 2).attr("y", FY + FH / 2 + 12).text("Drag between dots to connect");
+    }
+    for (const e of board.edges) {
+      const g = geom(e), st = SPECIES[e.s].style, external = !isVertex(nodeOf(board, e.a));
+      const ge = svg.append("g").attr("class", `edge ${st}${selection?.edge === e.id ? " selected" : ""}`).style("color", `var(--${st})`);
+      const path = edgePath(st, g);
+      if (problemEdges.has(e.id)) ge.append("path").attr("d", path).attr("class", "problem");
+      ge.append("path").attr("class", "sel").attr("d", path);
+      ge.append("path").attr("class", "line").attr("d", path);
+      if (isFermion(e.s)) {
+        const forward = external ? arrowIntoDiagram(level.legs[nodeOf(board, e.a).leg]) : true;
+        ge.append("path").attr("class", "arrow").attr("d", arrowPath(g, !forward));
+      }
+      if (!external) {
+        const { p, t } = locate(g, g.L / 2), d = isFermion(e.s) ? 17 : 21;
+        ge.append("text").attr("x", p[0] - t[1] * d).attr("y", p[1] + t[0] * d).text(SPECIES[e.s].virt);
+      }
+    }
+    if (rubber) svg.append("line").attr("class", "rubber").attr("x1", rubber[0][0]).attr("y1", rubber[0][1]).attr("x2", rubber[1][0]).attr("y2", rubber[1][1]);
+    for (const n of board.nodes) {
+      const [x, y] = pt(n);
+      if (n.leg !== null) {
+        const l = level.legs[n.leg], st = SPECIES[l.s].style;
+        if (problemNodes.has(n.id)) svg.append("circle").attr("class", "problem-ring").attr("cx", x).attr("cy", y).attr("r", 14);
+        svg.append("circle").attr("cx", x).attr("cy", y).attr("r", 8).attr("fill", "var(--surface)").attr("stroke", `var(--${st})`).attr("stroke-width", edgesAt(board, n.id).length ? 1.5 : 2.5);
+        svg.append("text").attr("class", "leg-label").attr("x", x).attr("y", y - 18).style("fill", `var(--${st})`).text(legSymbol(l));
+      } else {
+        if (problemNodes.has(n.id)) svg.append("circle").attr("class", "problem-dot").attr("cx", x).attr("cy", y).attr("r", 14);
+        if (selection?.node === n.id) svg.append("circle").attr("class", "sel-dot").attr("cx", x).attr("cy", y).attr("r", 14);
+        svg.append("circle").attr("cx", x).attr("cy", y).attr("r", 6).attr("fill", "var(--ink)");
+      }
+    }
+    svg.append("g").attr("class", "celebration");
+  }
+
+  // A valid diagram plays a sweep: a "now" line crosses the board and particles ride every line.
+  function celebrate() {
+    if (reduceMotion) return;
+    stopCelebration();
+    celebration = d3.timer(elapsed => {
+      const k = Math.min(1, elapsed / 2600), ease = d3.easeCubicInOut(k), x = FX + FW * (0.02 + 0.96 * ease);
+      const g = svg.select("g.celebration"); g.selectChildren().remove();
+      g.append("line").attr("class", "now-line").attr("x1", x).attr("x2", x).attr("y1", FY - 10).attr("y2", FY + FH + 6);
+      for (const e of board.edges) {
+        const s = geom(e);
+        for (let i = 1; i < s.pts.length; i++) {
+          const [ax, ay] = s.pts[i - 1], [bx, by] = s.pts[i];
+          if ((ax - x) * (bx - x) > 0 || ax === bx) continue;
+          const y = ay + (by - ay) * (x - ax) / (bx - ax), virtual = isVertex(nodeOf(board, e.a));
+          const color = isFermion(e.s) ? "#FFD84A" : `var(--${SPECIES[e.s].style})`, r = 14 * (virtual ? 1 + 0.35 * Math.sin(k * 40) : 1);
+          g.append("circle").attr("cx", x).attr("cy", y).attr("r", r).attr("fill", color).attr("opacity", 0.3);
+          g.append("circle").attr("cx", x).attr("cy", y).attr("r", 6.5).attr("fill", color);
+          g.append("circle").attr("cx", x).attr("cy", y).attr("r", 2.5).attr("fill", "#fff");
+          break;
+        }
+      }
+      for (const v of boardVertices(board)) {
+        const [vx, vy] = pt(v), d = Math.abs(vx - x);
+        if (d < 40) g.append("circle").attr("cx", vx).attr("cy", vy).attr("r", 8 + (40 - d) * 0.5).attr("fill", "none").attr("stroke", "#FFD84A").attr("stroke-width", 3).attr("opacity", 1 - d / 40);
+      }
+      if (k >= 1) { g.selectChildren().remove(); stopCelebration(); }
+    });
+  }
+  function stopCelebration() { celebration?.stop(); celebration = null; }
+
+  function render() {
+    slot("count").textContent = `Level ${index + 1} of ${LEVELS.length}`;
+    const unlockedSpecies = new Set(LEVELS.filter((l, i) => isUnlocked(i)).flatMap(l => [...levelSpecies(l)]));
+    slot("zoo-btn").textContent = `Particle Zoo ${unlockedSpecies.size}/${SPECIES_ORDER.length}`;
+    slot("zoo-btn").onclick = () => openZoo(unlockedSpecies);
+    const sel = slot("levels");
+    sel.replaceChildren(...LEVELS.map((l, i) => {
+      const o = el(`<option value="${i}">${i + 1}. ${isUnlocked(i) ? esc(l.title) + " " + "★".repeat(stars[l.id] ?? 0) : "🔒 Locked"}</option>`);
+      o.disabled = !isUnlocked(i); return o;
+    }));
+    sel.value = index; sel.onchange = () => go(+sel.value);
+    slot("title").textContent = level.title;
+    slot("process").textContent = processText(level);
+    slot("goal").textContent = level.goal;
+
+    // New-particle introduction card.
+    const fresh = introducedAt(index).filter(s => !seen.has(s));
+    const intro = slot("intro");
+    intro.replaceChildren();
+    if (fresh.length) {
+      const card = el(`<aside class="newcard"><h3>✨ ${index === 0 ? "Your first particles" : fresh.length === 1 ? "New particle unlocked!" : "New particles unlocked!"}</h3></aside>`);
+      for (const s of fresh) {
+        const row = el(`<div class="newrow"><div class="newline"></div><div><b class="math">${esc(symbolOf(s))} · ${esc(capitalize(SPECIES[s].name))}</b><p class="small muted">${esc(SPECIES[s].fact)}</p></div></div>`);
+        row.querySelector(".newline").append(lineSample(SPECIES[s].style));
+        card.append(row);
+      }
+      const ok = el(`<button class="btn primary small">Got it</button>`);
+      ok.onclick = () => { fresh.forEach(s => seen.add(s)); store.set("seen", [...seen]); render(); };
+      card.append(ok); intro.append(card);
+    }
+
+    const selEdge = selection?.edge !== undefined ? board.edges.find(e => e.id === selection.edge) : null;
+    const selInternal = selEdge && isVertex(nodeOf(board, selEdge.a));
+    slot("palette-label").textContent = selInternal ? "Change the selected line to:" : "New lines between vertices are:";
+    const pal = root.querySelector(".palette");
+    pal.replaceChildren(...level.palette.map(s => {
+      const b = el(`<button class="pal${species === s ? " on" : ""}" title="${esc(SPECIES[s].name)}"><span class="pal-line"></span><span class="math">${esc(SPECIES[s].virt)}</span></button>`);
+      b.querySelector(".pal-line").append(lineSample(SPECIES[s].style));
+      b.onclick = () => {
+        species = s;
+        if (selInternal) change(bd => { bd.edges.find(e => e.id === selEdge.id).s = s; return null; }); else render();
+      };
+      return b;
+    }));
+
+    const controls = slot("controls");
+    controls.replaceChildren();
+    const btn = (label, cls, fn, disabled = false) => { const b = el(`<button class="btn ${cls}">${label}</button>`); b.onclick = fn; b.disabled = disabled; controls.append(b); };
+    btn("Check", "primary", () => {
+      const result = checkBoard(board, level);
+      notice = null; wrongGuess = false;
+      if (level.par === null && result.valid) {
+        // Can't happen with these rules, so a "valid" board here would be a bug in the checker.
+        result.problems.push({ message: "Hmm, that passed the rules. This level should be impossible, so please report it!", nodes: [], edges: [] });
+        result.valid = false;
+      }
+      check = result;
+      if (result.valid) { record(starsFor(result, level)); render(); celebrate(); } else render();
+    });
+    btn("It can't happen", "", () => {
+      if (level.par === null) { check = { problems: [], valid: true, vertexCount: 0, loops: 0 }; record(3); } else { wrongGuess = true; check = null; }
+      render();
+    });
+    if (selInternal && isFermion(selEdge.s)) btn("⇄ Flip arrow", "", () => change(bd => { const e = bd.edges.find(x => x.id === selEdge.id); [e.a, e.b] = [e.b, e.a]; return null; }));
+    if (selection) btn("Delete", "", () => {
+      const sel = selection; selection = null;
+      change(bd => {
+        if (sel.edge !== undefined) bd.edges = bd.edges.filter(e => e.id !== sel.edge);
+        else { bd.edges = bd.edges.filter(e => e.a !== sel.node && e.b !== sel.node); bd.nodes = bd.nodes.filter(n => n.id !== sel.node); }
+        return null;
+      });
+    });
+    btn("↶ Undo", "", () => { if (history.length) { board = history.pop(); selection = null; check = null; notice = null; stopCelebration(); render(); } }, !history.length);
+    btn("Clear", "", () => { selection = null; change(bd => { const fresh = newBoard(level); bd.nodes = fresh.nodes; bd.edges = fresh.edges; bd.next = fresh.next; return null; }); });
+
+    const fb = slot("feedback");
+    fb.replaceChildren();
+    if (notice) fb.append(el(`<p class="notice">✋ ${esc(notice)}</p>`));
+    if (wrongGuess) fb.append(el(`<div class="result warn"><b>It can happen! Keep building.</b><p>Hint: ${esc(level.hint)}</p></div>`));
+    if (check?.valid) {
+      const earned = level.par === null ? 3 : starsFor(check, level);
+      const box = el(`<div class="result ok">
+        <p><span class="stars">${"★".repeat(earned)}${"☆".repeat(3 - earned)}</span> <b>${level.par === null ? "Right!" : `Valid diagram: ${check.vertexCount} vertices, ${check.loops} loop${check.loops === 1 ? "" : "s"}.`}</b></p>
+        ${level.par !== null && check.vertexCount > level.par ? `<p class="muted">It works, but it can be done with ${level.par} vertices. Each extra pair of vertices makes the process about 1/137 as likely in QED, so the simplest diagram dominates.</p>` : ""}
+        <p>${esc(level.lesson)}</p></div>`);
+      if (index + 1 < LEVELS.length) { const n = el(`<button class="btn primary small">Next level</button>`); n.onclick = () => go(index + 1); box.append(n); }
+      else box.append(el(`<p><b>That's every level. Nicely done!</b></p>`));
+      fb.append(box);
+    } else if (check) {
+      fb.append(el(`<div class="result warn"><b>Not quite</b>${check.problems.map(p => `<p>• ${esc(p.message)}</p>`).join("")}<p class="muted">Hint: ${esc(level.hint)}</p></div>`));
+    }
+    drawBoard();
+    Ask.refresh();
+  }
+
+  function openZoo(unlocked) {
+    const order = [...SPECIES_ORDER].sort((a, b) => firstLevelFor(a) - firstLevelFor(b));
+    const overlay = el(`<div class="zoo-overlay" role="dialog" aria-modal="true" aria-label="Particle Zoo"><div class="zoo">
+      <div class="zoo-head"><h2>Particle Zoo</h2><button class="btn small">Done</button></div><div class="zoo-grid"></div></div></div>`);
+    const grid = overlay.querySelector(".zoo-grid");
+    for (const s of order) {
+      if (unlocked.has(s)) {
+        const card = el(`<div class="zoo-card"><div class="zoo-line"></div><b class="math">${esc(symbolOf(s))} · ${esc(capitalize(SPECIES[s].name))}</b>
+          <span class="small muted">Charge ${esc(chargeLabel(s))} · Mass ${esc(SPECIES[s].mass)}</span><p class="small">${esc(SPECIES[s].fact)}</p></div>`);
+        card.querySelector(".zoo-line").append(lineSample(SPECIES[s].style));
+        grid.append(card);
+      } else grid.append(el(`<div class="zoo-card locked"><span class="q">?</span><b>Locked</b><span class="small muted">Unlocks at level ${firstLevelFor(s) + 1}</span></div>`));
+    }
+    const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
+    const onKey = e => { if (e.key === "Escape") close(); };
+    overlay.querySelector("button").onclick = close;
+    overlay.onclick = e => { if (e.target === overlay) close(); };
+    document.addEventListener("keydown", onKey);
+    document.body.append(overlay);
+    overlay.querySelector("button").focus();
+  }
+
+  function contextText() {
+    const label = id => { const n = nodeOf(board, id); return isVertex(n) ? `vertex #${boardVertices(board).indexOf(n) + 1}` : `external ${legSymbol(level.legs[n.leg])} (${level.legs[n.leg].incoming ? "in" : "out"})`; };
+    const lines = [
+      `Diagram-building game, level ${index + 1} of ${LEVELS.length}: "${level.title}" — ${processText(level)}.`,
+      `Goal: ${level.goal}`,
+      `Rules: click to add vertices, drag between dots to draw lines; internal lines use the chosen particle (${level.palette.map(s => symbolOf(s)).join(", ")} available). Every vertex joins exactly three lines; only Standard Model vertices count (f f γ for charged f, q q g, g g g, f f H, and the W between weak partners e↔νₑ, μ↔νμ, u↔d); fermion arrows go in and out; charge is conserved. Fewer vertices is better (par ${level.par ?? "n/a"}).`,
+      level.par === null ? "This is a trick level; the player can press \"It can't happen\"." : "",
+      `Current board: ${boardVertices(board).length} vertices.`,
+      ...board.edges.map(e => `  - ${SPECIES[e.s].name} line between ${label(e.a)} and ${label(e.b)}${isFermion(e.s) && isVertex(nodeOf(board, e.a)) ? ` (arrow ${label(e.a)} → ${label(e.b)})` : ""}`),
+      check ? (check.valid ? `Last check: valid with ${check.vertexCount} vertices and ${check.loops} loop(s).` : "Last check found problems: " + check.problems.map(p => p.message).join(" | ")) : "",
+      "Help the player reason it out. Give hints rather than the full solution unless they ask for it.",
+    ];
+    return lines.filter(Boolean).join("\n");
+  }
+
+  go(index);
+  return { el: root, destroy: stopCelebration, context: () => ({
+    title: "Diagram Builder Game",
+    body: contextText(),
+    suggestions: check?.valid ? ["Why does this diagram work?", "Is there another valid diagram for this process?"] : ["Give me a hint without the answer.", "What's wrong with my diagram?"],
+  }) };
+}
+
 /* ---------- Ask Claude drawer ---------- */
 const Ask = (() => {
   const app = document.getElementById("app"), panel = document.getElementById("ask"), toggle = document.getElementById("ask-toggle");
@@ -1327,6 +1896,7 @@ const ROUTES = [
     color: INTERACTIONS[d.interaction].color, make: () => processPage(d) })),
   { id: "orders", group: "Go deeper", title: "Orders & loops", mark: "Σ", make: ordersPage },
   { id: "quiz", group: "Go deeper", title: "Quiz", mark: "?", make: quizPage },
+  { id: "game", group: "Go deeper", title: "Diagram Builder Game", mark: "⧉", make: gamePage },
 ];
 let current = null;
 (function buildNav() {
