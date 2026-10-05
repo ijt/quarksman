@@ -1,6 +1,13 @@
 # Quarksman
 
-An interactive SwiftUI app for learning to read Feynman diagrams, for macOS, iPhone and iPad.
+Feynman diagrams you can play with. Quarksman is an interactive app for learning to read Feynman diagrams, as a native SwiftUI app for macOS, iPhone and iPad, and as a single-page web version built with d3.
+
+![The H → γγ page in the Mac app, with the virtual top quark selected and its Feynman rule shown](docs/screenshots/mac-higgs.png)
+
+<p>
+  <img src="docs/screenshots/web-game.png" width="62%" alt="The Diagram Builder Game in the web version, with a valid Møller scattering diagram and three stars">
+  <img src="docs/screenshots/iphone-game.png" width="30%" alt="The Diagram Builder Game on iPhone">
+</p>
 
 - **Learn**: what the diagrams mean, the line styles for each particle, and a rotatable QED vertex.
 - **Processes**: ten real processes (e⁺e⁻ → μ⁺μ⁻, Compton scattering, β decay, Higgs → γγ, …). Click any line or vertex to see its Feynman rule, and drag a time slice to see which particles exist at each moment.
@@ -31,13 +38,20 @@ To run on your own device, select your team under **Signing & Capabilities**, an
 
 If you don't have a simulator, install one from **Xcode → Settings → Components**, or run `xcodebuild -downloadPlatform iOS`.
 
+## Run the web version
+
+Open `web/index.html` in a browser. It's a single file that loads d3 from a CDN and has the same lessons, processes and game as the app, with progress saved in the browser.
+
+Ask Claude in the web version works when the page is hosted as a claude.ai artifact, where it runs on the viewer's own Claude account. Opened as a local file, it hides itself.
+
 ## Tests
 
 ```sh
-swift test
+swift test                          # app: game rules, line selection, diagram labels
+node web/tests/game-rules.test.mjs  # web: the same game-rule scenarios
 ```
 
-The tests cover the Diagram Builder Game's physics rules (vertex types, fermion arrows, charge and flavor conservation).
+The game tests cover the physics rules: vertex types, fermion arrows, and charge and flavor conservation.
 
 ## Ask Claude
 
@@ -59,3 +73,12 @@ Conversations are saved per page in `~/Library/Application Support/Quarksman/con
   brew install xcodegen   # once
   xcodegen
   ```
+
+## How it was built
+
+Quarksman was built over a couple of days in October 2026 by Issac Trotts working with [Claude Code](https://claude.com/claude-code). Issac set the direction and made the product, physics and design calls, and Claude Code wrote most of the code. Commits carry a `Co-Authored-By: Claude` trailer, and the history shows how the app took shape, one small commit at a time.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
+
