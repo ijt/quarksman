@@ -2,6 +2,8 @@
 
 Feynman diagrams you can play with. Quarksman is an interactive app for learning to read Feynman diagrams, as a native SwiftUI app for macOS, iPhone and iPad, and as a single-page web version built with d3.
 
+**[Try the web version](https://ijt.github.io/quarksman/web/)** · **[Watch the 82-second demo](https://ijt.github.io/quarksman/docs/Quarksman-demo.mp4)**
+
 ![The H → γγ page in the Mac app, with the virtual top quark selected and its Feynman rule shown](docs/screenshots/mac-higgs.png)
 
 <p>
@@ -40,7 +42,7 @@ If you don't have a simulator, install one from **Xcode → Settings → Compone
 
 ## Run the web version
 
-Open `web/index.html` in a browser. It's a single file that loads d3 from a CDN and has the same lessons, processes and game as the app, with progress saved in the browser.
+Open [ijt.github.io/quarksman/web](https://ijt.github.io/quarksman/web/), or open `web/index.html` from a checkout in a browser. It's a single file that loads d3 from a CDN and has the same lessons, processes and game as the app, with progress saved in the browser.
 
 Ask Claude in the web version works when the page is hosted as a claude.ai artifact, where it runs on the viewer's own Claude account. Opened as a local file, it hides itself.
 
